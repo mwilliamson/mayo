@@ -36,7 +36,7 @@ def parent(file_path):
         return parent
 
 def add_delegated_commands(commands):
-    for command_name in ["status", "commit", "add", "diff"]:
+    for command_name in ["status", "commit", "add", "diff", "push"]:
         commands[command_name] = delegated_command(command_name)
 
 def delegated_command(command_name):

@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 
 def find_command(name):
     return commands[name]
@@ -33,7 +35,21 @@ def parent(file_path):
     else:
         return parent
 
+def add_delegated_commands(commands):
+    for command_name in ["status", "commit", "add", "diff"]:
+        commands[command_name] = delegated_command(command_name)
+
+def delegated_command(command_name):
+    def execute_command():
+        repository = find_current_repository()
+        command = repository.type
+        sys.exit(subprocess.call([command] + sys.argv[1:]))
+        
+    return execute_command
+
 commands = {
     "whatisthis": what_is_this_command,
     "what-is-this": what_is_this_command
 }
+
+add_delegated_commands(commands)

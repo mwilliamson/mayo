@@ -4,22 +4,27 @@ def find_command(name):
     return commands[name]
 
 def what_is_this_command():
-    system = what_is_this()
-    if system is None:
-        print "Unrecognised source control system"
+    repository = find_current_repository()
+    if repository is None:
+        print "Could not find source control repository"
     else:
-        print system
+        print "{0}+file://{1}".format(repository.type, repository.path)
 
-def what_is_this():
+def find_current_repository():
     directory = os.getcwd()
     while directory is not None:
         files = os.listdir(directory)
         if ".git" in files:
-            return "git"
+            return Repository(os.path.join(directory, ".git"), "git")
         
         directory = parent(directory)
         
     return None
+
+class Repository(object):
+    def __init__(self, repo_path, repo_type):
+        self.path = repo_path
+        self.type = repo_type
 
 def parent(file_path):
     parent = os.path.dirname(file_path)
@@ -29,5 +34,6 @@ def parent(file_path):
         return parent
 
 commands = {
-    "whatisthis": what_is_this_command
+    "whatisthis": what_is_this_command,
+    "what-is-this": what_is_this_command
 }

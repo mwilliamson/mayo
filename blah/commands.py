@@ -3,6 +3,7 @@ import subprocess
 import sys
 
 import blah.finder
+import blah.fetcher
 
 def find_command(name):
     return commands[name]
@@ -15,7 +16,13 @@ def what_is_this_command():
     else:
         print "{0}+file://{1}".format(repository.type, repository.path)
 
+def fetch_command():
+    repository_uri = sys.argv[2]
+    local_path = sys.argv[3]
+    blah.fetcher.fetch(repository_uri, local_path)
+
 commands = {
     "whatisthis": what_is_this_command,
-    "what-is-this": what_is_this_command
+    "what-is-this": what_is_this_command,
+    "fetch": fetch_command
 }

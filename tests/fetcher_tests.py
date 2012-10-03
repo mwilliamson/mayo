@@ -2,7 +2,7 @@ import os
 import subprocess
 from contextlib import contextmanager
 
-from nose.tools import istest, assert_equal
+from nose.tools import istest, assert_equal, assert_raises
 
 from blah.fetcher import fetch
 from blah.repositories import Repository
@@ -16,6 +16,13 @@ def can_fetch_git_repository_into_new_directory():
             original_uri = "git+file://" + git_repo.path
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+@istest
+def exception_is_thrown_if_repository_uri_is_not_recognised():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        original_uri = "asf+file:///tmp"
+        assert_raises(RuntimeError, lambda: fetch(original_uri, target))
         
 @contextmanager
 def temporary_git_repo():

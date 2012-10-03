@@ -16,6 +16,19 @@ def can_fetch_git_repository_into_new_directory():
             original_uri = "git+file://" + git_repo.path
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
+        
+@istest
+def can_update_git_repository_to_latest_version():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.path
+            fetch(original_uri, target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+            add_commit_to_git_repo(git_repo)
+            fetch(original_uri, target)
+            assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
 @istest
 def exception_is_thrown_if_repository_uri_is_not_recognised():
@@ -31,4 +44,10 @@ def temporary_git_repo():
         write_file(os.path.join(path, "README"), "Run it.")
         subprocess.check_call(["git", "add", "README"], cwd=path)
         subprocess.check_call(["git", "commit", "-mAdding README"], cwd=path)
+        # TODO: repository.path should actually be the .git directory
         yield Repository(path, "git")
+
+def add_commit_to_git_repo(repo):
+    write_file(os.path.join(repo.path, "README"), "Run away!")
+    subprocess.check_call(["git", "add", "README"], cwd=repo.path)
+    subprocess.check_call(["git", "commit", "-mUpdating README"], cwd=repo.path)

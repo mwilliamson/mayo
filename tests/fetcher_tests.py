@@ -9,7 +9,7 @@ from blah.repositories import Repository
 from tests.files import mkdir_p, temporary_directory, write_file, read_file
 
 @istest
-def can_fetch_git_repository():
+def can_fetch_git_repository_into_new_directory():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:

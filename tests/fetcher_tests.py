@@ -61,11 +61,12 @@ def exception_is_thrown_if_repository_uri_is_not_recognised():
 @contextmanager
 def temporary_git_repo():
     with temporary_directory() as path:
-        subprocess.check_call(["git", "init"], cwd=path)
+        repository = Repository(os.path.join(path, ".git"), "git")
+        repository.execute(["init"])
         write_file(os.path.join(path, "README"), "Run it.")
-        subprocess.check_call(["git", "add", "README"], cwd=path)
-        subprocess.check_call(["git", "commit", "-mAdding README"], cwd=path)
-        yield Repository(os.path.join(path, ".git"), "git")
+        repository.execute(["add", "README"])
+        repository.execute(["commit", "-mAdding README"])
+        yield repository
 
 def add_commit_to_git_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")
@@ -75,11 +76,12 @@ def add_commit_to_git_repo(repo):
 @contextmanager
 def temporary_hg_repo():
     with temporary_directory() as path:
-        subprocess.check_call(["hg", "init"], cwd=path)
+        repository = Repository(os.path.join(path, ".hg"), "hg")
+        repository.execute(["init"])
         write_file(os.path.join(path, "README"), "Run it.")
-        subprocess.check_call(["hg", "add", "README"], cwd=path)
-        subprocess.check_call(["hg", "commit", "-mAdding README"], cwd=path)
-        yield Repository(os.path.join(path, ".hg"), "hg")
+        repository.execute(["add", "README"])
+        repository.execute(["commit", "-mAdding README"])
+        yield repository
 
 def add_commit_to_hg_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")

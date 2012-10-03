@@ -69,8 +69,8 @@ def temporary_git_repo():
 
 def add_commit_to_git_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")
-    subprocess.check_call(["git", "add", "README"], cwd=repo.working_directory)
-    subprocess.check_call(["git", "commit", "-mUpdating README"], cwd=repo.working_directory)
+    repo.execute(["add", "README"])
+    repo.execute(["commit", "-mUpdating README"])
         
 @contextmanager
 def temporary_hg_repo():
@@ -83,5 +83,5 @@ def temporary_hg_repo():
 
 def add_commit_to_hg_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")
-    subprocess.check_call(["hg", "add", "README"], cwd=repo.working_directory)
-    subprocess.check_call(["hg", "commit", "-mUpdating README"], cwd=repo.working_directory)
+    repo.execute(["add", "README"])
+    repo.execute(["commit", "-mUpdating README"])

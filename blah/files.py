@@ -27,3 +27,10 @@ def write_file(path, contents):
 def read_file(path):
     with open(path, "r") as f:
         return f.read()
+
+def parent(file_path):
+    parent = os.path.dirname(file_path)
+    if file_path == parent:
+        return None
+    else:
+        return parent

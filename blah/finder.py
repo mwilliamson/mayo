@@ -1,5 +1,6 @@
 import os
 
+from blah.files import parent
 from blah.repositories import Repository
 
 def find_repository(directory):
@@ -14,10 +15,3 @@ def find_repository(directory):
         directory = parent(directory)
         
     return None
-
-def parent(file_path):
-    parent = os.path.dirname(file_path)
-    if file_path == parent:
-        return None
-    else:
-        return parent

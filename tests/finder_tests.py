@@ -1,12 +1,9 @@
 import os
-import tempfile
-import shutil
-from contextlib import contextmanager
 
 from nose.tools import istest, assert_equal
 
 from blah.finder import find_repository
-from tests.files import mkdir_p
+from tests.files import mkdir_p, temporary_directory
 
 @istest
 def none_is_returned_if_there_is_no_repository():
@@ -44,10 +41,3 @@ def ancestors_are_searched_for_repositories():
         mkdir_p(search_path)
         repository = find_repository(search_path)
         assert_equal(repository_path, repository.path)
-
-@contextmanager
-def temporary_directory():
-    directory = tempfile.mkdtemp()
-    yield directory
-    shutil.rmtree(directory)
-

@@ -1,5 +1,8 @@
 import os
 import errno
+import shutil
+from contextlib import contextmanager
+import tempfile
 
 def mkdir_p(path):
     """ 'mkdir -p' in Python """
@@ -10,4 +13,9 @@ def mkdir_p(path):
             pass
         else:
             raise
-
+            
+@contextmanager
+def temporary_directory():
+    directory = tempfile.mkdtemp()
+    yield directory
+    shutil.rmtree(directory)

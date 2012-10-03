@@ -6,14 +6,15 @@ def find_command(name):
     return commands[name]
 
 def what_is_this_command():
-    repository = find_current_repository()
+    directory = sys.argv[2] if len(sys.argv) > 2 else os.getcwd()
+    repository = find_repository(directory)
     if repository is None:
         print "Could not find source control repository"
     else:
         print "{0}+file://{1}".format(repository.type, repository.path)
 
-def find_current_repository():
-    directory = os.getcwd()
+def find_repository(directory):
+    directory = os.path.abspath(directory)
     while directory is not None:
         files = os.listdir(directory)
         if ".git" in files:

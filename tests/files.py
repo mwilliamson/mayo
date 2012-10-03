@@ -19,3 +19,11 @@ def temporary_directory():
     directory = tempfile.mkdtemp()
     yield directory
     shutil.rmtree(directory)
+
+def write_file(path, contents):
+    with open(path, "w") as f:
+        return f.write(contents)
+
+def read_file(path):
+    with open(path, "r") as f:
+        return f.read()

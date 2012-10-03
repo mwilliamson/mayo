@@ -1,5 +1,7 @@
 import os
 
+from blah.repositories import Repository
+
 def find_repository(directory):
     directory = os.path.abspath(directory)
     while directory is not None:
@@ -12,11 +14,6 @@ def find_repository(directory):
         directory = parent(directory)
         
     return None
-
-class Repository(object):
-    def __init__(self, repo_path, repo_type):
-        self.path = repo_path
-        self.type = repo_type
 
 def parent(file_path):
     parent = os.path.dirname(file_path)

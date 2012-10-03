@@ -8,6 +8,6 @@ setup(
     description='Thin wrapper around source control systems',
     author='Michael Williamson',
     url='http://github.com/mwilliamson/blah',
-    scripts='',
+    scripts=["scripts/blah"],
     packages=['blah'],
 )

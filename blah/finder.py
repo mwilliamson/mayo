@@ -6,6 +6,8 @@ def find_repository(directory):
         files = os.listdir(directory)
         if ".git" in files:
             return Repository(os.path.join(directory, ".git"), "git")
+        if ".hg" in files:
+            return Repository(os.path.join(directory, ".hg"), "hg")
         
         directory = parent(directory)
         

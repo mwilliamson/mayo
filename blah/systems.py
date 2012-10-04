@@ -4,6 +4,7 @@ import subprocess
 class Git(object):
     def __init__(self):
         self.name = "git"
+        self.vcs_directory = ".git"
 
     def fetch(self, repository_uri, local_path):
         if os.path.exists(local_path):
@@ -16,6 +17,7 @@ class Git(object):
 class Hg(object):
     def __init__(self):
         self.name = "hg"
+        self.vcs_directory = ".hg"
 
     def fetch(self, repository_uri, local_path):
         if os.path.exists(local_path):

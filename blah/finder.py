@@ -10,7 +10,7 @@ def find_repository(directory):
         files = os.listdir(directory)
         for system in systems.all_systems:
             if system.vcs_directory in files:
-                return Repository(os.path.join(directory, system.vcs_directory), system.name)
+                return system.repo(os.path.join(directory, system.vcs_directory))
         
         directory = parent(directory)
         

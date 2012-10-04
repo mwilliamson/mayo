@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from blah.repositories import Repository
+
 class Git(object):
     def __init__(self):
         self.name = "git"
@@ -12,7 +14,9 @@ class Git(object):
             subprocess.check_call(["git", "pull"], cwd=local_path)
         else:
             subprocess.check_call(["git", "clone", repository_uri, local_path])
-        
+    
+    def repo(self, repo_path):
+        return Repository(repo_path, self.name)
 
 class Hg(object):
     def __init__(self):
@@ -26,5 +30,8 @@ class Hg(object):
             subprocess.check_call(["hg", "update"], cwd=local_path)
         else:
             subprocess.check_call(["hg", "clone", repository_uri, local_path])
-
+            
+    def repo(self, repo_path):
+        return Repository(repo_path, self.name)
+        
 all_systems = [Git(), Hg()]

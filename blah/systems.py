@@ -3,18 +3,32 @@ import subprocess
 
 from blah.repositories import Repository
 
+dev_null = open('/dev/null', 'w')
+
 class Git(object):
     default_branch = "origin/master"
     
     def update(self, repository_uri, local_path, version):
-        subprocess.check_call(["git", "fetch"], cwd=local_path)
-        if subprocess.call(["git", "branch", "-r", "--contains", "origin/" + version]) == 0:
+        self._check_call("fetch", cwd=local_path)
+        if self._call("branch", "-r", "--contains", "origin/" + version, cwd=local_path) == 0:
             version = "origin/" + version
             
-        subprocess.check_call(["git", "checkout", version], cwd=local_path)
+        self._check_call("checkout", version, cwd=local_path)
             
     def clone(self, repository_uri, local_path, version):
-        subprocess.check_call(["git", "clone", repository_uri, local_path])
+        self._check_call("clone", repository_uri, local_path)
+
+    def _check_call(self, *args, **kwargs):
+        return self._subprocess_eval(subprocess.check_call, args, kwargs)
+
+    def _call(self, *args, **kwargs):
+        return self._subprocess_eval(subprocess.call, args, kwargs)
+        
+    def _subprocess_eval(self, func, args, kwargs):
+        return func(self._command(*args), stdout=dev_null, stderr=subprocess.STDOUT, **kwargs)
+
+    def _command(self, command, *args):
+        return ["git", command] + list(args)
 
 class Hg(object):
     default_branch = "default"

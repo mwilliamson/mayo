@@ -2,6 +2,8 @@ import subprocess
 
 import blah.files
 
+_dev_null = open('/dev/null', 'w')
+
 class Repository(object):
     def __init__(self, repo_path, repo_type):
         self.path = repo_path
@@ -10,4 +12,5 @@ class Repository(object):
         
     def execute(self, command):
         command = [self.type] + command
-        subprocess.check_call(command, cwd=self.working_directory)
+        subprocess.check_call(command, cwd=self.working_directory,
+            stdout=_dev_null, stderr=subprocess.STDOUT)

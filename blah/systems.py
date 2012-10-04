@@ -3,29 +3,20 @@ import subprocess
 
 from blah.repositories import Repository
 
-dev_null = open('/dev/null', 'w')
+_dev_null = open('/dev/null', 'w')
 
 class Git(object):
     default_branch = "origin/master"
     
     def update(self, repository_uri, local_path, version):
-        self._check_call("fetch", cwd=local_path)
-        if self._call("branch", "-r", "--contains", "origin/" + version, cwd=local_path) == 0:
+        _quiet_check_call(self._command("fetch"), cwd=local_path)
+        if _quiet_call(self._command("branch", "-r", "--contains", "origin/" + version), cwd=local_path) == 0:
             version = "origin/" + version
             
-        self._check_call("checkout", version, cwd=local_path)
+        _quiet_check_call(self._command("checkout", version), cwd=local_path)
             
     def clone(self, repository_uri, local_path, version):
-        self._check_call("clone", repository_uri, local_path)
-
-    def _check_call(self, *args, **kwargs):
-        return self._subprocess_eval(subprocess.check_call, args, kwargs)
-
-    def _call(self, *args, **kwargs):
-        return self._subprocess_eval(subprocess.call, args, kwargs)
-        
-    def _subprocess_eval(self, func, args, kwargs):
-        return func(self._command(*args), stdout=dev_null, stderr=subprocess.STDOUT, **kwargs)
+        _quiet_check_call(self._command("clone", repository_uri, local_path))
 
     def _command(self, command, *args):
         return ["git", command] + list(args)
@@ -34,11 +25,11 @@ class Hg(object):
     default_branch = "default"
     
     def update(self, repository_uri, local_path, version):
-        subprocess.check_call(["hg", "pull"], cwd=local_path)
-        subprocess.check_call(["hg", "update", version], cwd=local_path)
+        _quiet_check_call(["hg", "pull"], cwd=local_path)
+        _quiet_check_call(["hg", "update", version], cwd=local_path)
         
     def clone(self, repository_uri, local_path, version):
-        subprocess.check_call(["hg", "clone", repository_uri, local_path])
+        _quiet_check_call(["hg", "clone", repository_uri, local_path])
 
 class SourceControlSystem(object):
     def __init__(self, name, fetcher):
@@ -65,3 +56,12 @@ all_systems = [
     SourceControlSystem("git", Git()),
     SourceControlSystem("hg", Hg())
 ]
+
+def _quiet_check_call(*args, **kwargs):
+    return _quiet_subprocess_eval(subprocess.check_call, args, kwargs)
+
+def _quiet_call(*args, **kwargs):
+    return _quiet_subprocess_eval(subprocess.call, args, kwargs)
+    
+def _quiet_subprocess_eval(func, args, kwargs):
+    return func(*args, stdout=_dev_null, stderr=subprocess.STDOUT, **kwargs)

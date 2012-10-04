@@ -29,6 +29,19 @@ def can_update_git_repository_to_latest_version():
             add_commit_to_git_repo(git_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
+        
+@istest
+def can_update_git_repository_to_specific_commit_using_hash_before_commit_name():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            add_commit_to_git_repo(git_repo)
+            fetch(original_uri, target)
+            assert_equal("Run away!", read_file(os.path.join(target, "README")))
+            
+            fetch(original_uri + "#master^", target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
 
 @istest
 def can_fetch_hg_repository_into_new_directory():

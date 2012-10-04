@@ -54,7 +54,7 @@ def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
         
 @istest
-def origin_is_prefixed_to_commit_if_necessary():
+def origin_is_prefixed_to_git_commit_if_necessary():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:

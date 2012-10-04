@@ -63,6 +63,18 @@ def can_update_hg_repository_to_latest_version():
             add_commit_to_hg_repo(hg_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
+@istest
+def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_hg_repo() as hg_repo:
+            original_uri = "hg+file://" + hg_repo.working_directory
+            add_commit_to_hg_repo(hg_repo)
+            fetch(original_uri, target)
+            assert_equal("Run away!", read_file(os.path.join(target, "README")))
+            
+            fetch(original_uri + "#0", target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
 @istest
 def exception_is_thrown_if_repository_uri_is_not_recognised():

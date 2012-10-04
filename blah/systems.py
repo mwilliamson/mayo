@@ -18,7 +18,7 @@ class Hg(object):
     
     def update(self, repository_uri, local_path, version):
         subprocess.check_call(["hg", "pull"], cwd=local_path)
-        subprocess.check_call(["hg", "update"], cwd=local_path)
+        subprocess.check_call(["hg", "update", version], cwd=local_path)
         
     def clone(self, repository_uri, local_path, version):
         subprocess.check_call(["hg", "clone", repository_uri, local_path])

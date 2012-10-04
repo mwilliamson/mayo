@@ -4,10 +4,13 @@ import subprocess
 from blah.repositories import Repository
 
 class Git(object):
-    default_branch = "master"
+    default_branch = "origin/master"
     
     def update(self, repository_uri, local_path, version):
-        subprocess.check_call(["git", "pull"], cwd=local_path)
+        subprocess.check_call(["git", "fetch"], cwd=local_path)
+        if subprocess.call(["git", "branch", "-r", "--contains", "origin/" + version]) == 0:
+            version = "origin/" + version
+            
         subprocess.check_call(["git", "checkout", version], cwd=local_path)
             
     def clone(self, repository_uri, local_path, version):

@@ -42,6 +42,21 @@ def can_update_git_repository_to_specific_commit_using_hash_before_commit_name()
             
             fetch(original_uri + "#master^", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
+        
+@istest
+def origin_is_prefixed_to_commit_if_necessary():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            # master == origin/master
+            fetch(original_uri, target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+            add_commit_to_git_repo(git_repo)
+            # If we checkout master rather than origin/master, we don't change revision
+            fetch(original_uri + "#master", target)
+            assert_equal("Run away!", read_file(os.path.join(target, "README")))
 
 @istest
 def can_fetch_hg_repository_into_new_directory():
@@ -51,6 +66,7 @@ def can_fetch_hg_repository_into_new_directory():
             original_uri = "hg+file://" + hg_repo.working_directory
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
 @istest
 def can_update_hg_repository_to_latest_version():
     with temporary_directory() as directory:
@@ -63,6 +79,7 @@ def can_update_hg_repository_to_latest_version():
             add_commit_to_hg_repo(hg_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
+            
 @istest
 def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
     with temporary_directory() as directory:

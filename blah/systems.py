@@ -39,7 +39,7 @@ class Hg(object):
         
     def current_uri(self, local_path):
         uri = _quiet_check_output(["hg", "showconfig", "paths.default"], cwd=local_path).strip()
-        # Mercurial strips of the file:/// from the URI
+        # Mercurial strips off "file:///" from the URI
         if _is_local(uri):
             return "file://" + uri
         else:

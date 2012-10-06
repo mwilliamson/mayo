@@ -101,6 +101,24 @@ def origin_is_prefixed_to_git_commit_if_necessary():
             # If we checkout master rather than origin/master, we don't change revision
             fetch(original_uri + "#master", target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
+            
+@istest
+def error_is_raised_if_target_is_file():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        write_file(target, "Nope")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            assert_raises(RuntimeError, lambda: fetch(original_uri, target))
+            
+@istest
+def git_fetch_raises_error_if_target_is_not_git_repository():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        mkdir_p(target)
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            assert_raises(RuntimeError, lambda: fetch(original_uri, target))
 
 @istest
 def can_fetch_hg_repository_into_new_directory():

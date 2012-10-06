@@ -47,8 +47,14 @@ class SourceControlSystem(object):
             version = self._fetcher.default_branch
             
         if os.path.exists(local_path):
-            # TODO: check that local_path is a valid clone
-            self._fetcher.update(repository_uri, local_path)
+            vcs_directory = os.path.join(local_path, self.vcs_directory)
+            if not os.path.isdir(local_path):
+                raise RuntimeError("Checkout path already exists, and is not directory: " + local_path)
+            elif not os.path.isdir(vcs_directory):
+                raise RuntimeError("VCS directory doesn't exist: " + vcs_directory)
+            else:
+                # TODO: check that local_path is a valid clone
+                self._fetcher.update(repository_uri, local_path)
         else:
             self._fetcher.clone(repository_uri, local_path)
         self._fetcher.checkout_version(local_path, version)

@@ -16,4 +16,12 @@ Blah can also be used as a script:
 blah fetch git+https://github.com/mwilliamson/blah.git /tmp/blah
 ```
 
+Specific commits can be selected by appending a hash to the URI, followed by
+the name of the commit:
+
+```python
+blah.fetch("git+https://github.com/mwilliamson/blah.git#74d69b4", "/tmp/blah")
+```
+
+
 At the moment, git and hg URIs are supported.

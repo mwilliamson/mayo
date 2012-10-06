@@ -5,5 +5,7 @@ test:
 
 upload:
 	cp README.md README
-	python sdist upload
+	python setup.py sdist upload
 	rm README
+	rm MANIFEST
+	rm -r dist

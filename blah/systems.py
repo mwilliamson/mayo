@@ -114,4 +114,4 @@ Backported from Python 2.7 as it's implemented as pure python on stdlib.
     return output
 
 def _is_local(uri):
-    return ":" not in uri
+    return "://" not in uri

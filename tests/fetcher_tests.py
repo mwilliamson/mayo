@@ -119,6 +119,16 @@ def git_fetch_raises_error_if_target_is_not_git_repository():
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
             assert_raises(RuntimeError, lambda: fetch(original_uri, target))
+            
+@istest
+def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as first_repo:
+            with temporary_git_repo() as second_repo:
+                fetch("git+file://" + first_repo.working_directory, target)
+                assert_raises(RuntimeError,
+                    lambda: fetch("git+file://" + second_repo.working_directory, target))
 
 @istest
 def can_fetch_hg_repository_into_new_directory():
@@ -154,6 +164,16 @@ def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
             
             fetch(original_uri + "#0", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+@istest
+def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_hg_repo() as first_repo:
+            with temporary_hg_repo() as second_repo:
+                fetch("hg+file://" + first_repo.working_directory, target)
+                assert_raises(RuntimeError,
+                    lambda: fetch("hg+file://" + second_repo.working_directory, target))
         
 @contextmanager
 def temporary_git_repo():

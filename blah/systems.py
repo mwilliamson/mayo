@@ -19,6 +19,9 @@ class Git(object):
             version = "origin/" + version
         _quiet_check_call(self._command("checkout", version), cwd=local_path)
 
+    def current_uri(self, local_path):
+        return _quiet_check_output(self._command("config", "remote.origin.url"), cwd=local_path).strip()
+
     def _command(self, command, *args):
         return ["git", command] + list(args)
 
@@ -33,6 +36,14 @@ class Hg(object):
         
     def checkout_version(self, local_path, version):
         _quiet_check_call(["hg", "update", version], cwd=local_path)
+        
+    def current_uri(self, local_path):
+        uri = _quiet_check_output(["hg", "showconfig", "paths.default"], cwd=local_path).strip()
+        # Mercurial strips of the file:/// from the URI
+        if _is_local(uri):
+            return "file://" + uri
+        else:
+            return uri
 
 class SourceControlSystem(object):
     def __init__(self, name, fetcher):
@@ -53,8 +64,14 @@ class SourceControlSystem(object):
             elif not os.path.isdir(vcs_directory):
                 raise RuntimeError("VCS directory doesn't exist: " + vcs_directory)
             else:
-                # TODO: check that local_path is a valid clone
-                self._fetcher.update(repository_uri, local_path)
+                current_uri = self._fetcher.current_uri(local_path)
+                if current_uri == repository_uri:
+                    self._fetcher.update(repository_uri, local_path)
+                else:
+                    raise RuntimeError(
+                        "Checkout directory is checkout of different URI: " + current_uri +
+                        "\nExpected: " + repository_uri
+                    )
         else:
             self._fetcher.clone(repository_uri, local_path)
         self._fetcher.checkout_version(local_path, version)
@@ -73,5 +90,28 @@ def _quiet_check_call(*args, **kwargs):
 def _quiet_call(*args, **kwargs):
     return _quiet_subprocess_eval(subprocess.call, args, kwargs)
     
+def _quiet_check_output(*args, **kwargs):
+    return check_output(*args, stderr=_dev_null, **kwargs)
+    
 def _quiet_subprocess_eval(func, args, kwargs):
     return func(*args, stdout=_dev_null, stderr=subprocess.STDOUT, **kwargs)
+
+def check_output(*popenargs, **kwargs):
+    r"""Run command with arguments and return its output as a byte string.
+
+Backported from Python 2.7 as it's implemented as pure python on stdlib.
+"""
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        error = subprocess.CalledProcessError(retcode, cmd)
+        error.output = output
+        raise error
+    return output
+
+def _is_local(uri):
+    return ":" not in uri

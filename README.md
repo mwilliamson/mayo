@@ -10,4 +10,10 @@ blah.fetch("git+https://github.com/mwilliamson/blah.git", "/tmp/blah")
 print open("/tmp/blah/README.md").read()
 ```
 
+Blah can also be used as a script:
+
+```
+blah fetch git+https://github.com/mwilliamson/blah.git /tmp/blah
+```
+
 At the moment, git and hg URIs are supported.

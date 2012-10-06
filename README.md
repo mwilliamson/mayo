@@ -23,5 +23,4 @@ the name of the commit:
 blah.fetch("git+https://github.com/mwilliamson/blah.git#74d69b4", "/tmp/blah")
 ```
 
-
 At the moment, git and hg URIs are supported.

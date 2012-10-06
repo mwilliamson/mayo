@@ -1,4 +1,4 @@
-# Blah: Library for interacting with source control
+# Blah: Download source control URIs
 
 The main use of Blah is being able to download repositories from a URI that
 specifies what version control system is being used:

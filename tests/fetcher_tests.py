@@ -3,10 +3,34 @@ import subprocess
 from contextlib import contextmanager
 
 from nose.tools import istest, assert_equal, assert_raises
+import mock
 
 from blah.fetcher import fetch
 from blah.repositories import Repository
 from tests.files import mkdir_p, temporary_directory, write_file, read_file
+from blah import systems
+
+@istest
+def repository_is_used_if_uri_has_prefix():
+    git = mock_vcs("git")
+    hg = mock_vcs("hg")
+    git_uri = "http://www.example.com/project.git"
+    
+    fetch("git+" + git_uri, "/tmp/project", systems=[hg, git])
+    
+    git.fetch.assert_called_once_with(git_uri, "/tmp/project")
+    
+def mock_vcs(name):
+    vcs = mock.Mock()
+    vcs.name = name
+    return vcs
+
+@istest
+def error_is_raised_if_repository_uri_is_not_recognised():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        original_uri = "asf+file:///tmp"
+        assert_raises(RuntimeError, lambda: fetch(original_uri, target))
 
 @istest
 def can_fetch_git_repository_into_new_directory():
@@ -40,6 +64,16 @@ def can_update_git_repository_to_specific_commit_using_hash_before_commit_name()
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
+            fetch(original_uri + "#master^", target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+@istest
+def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            add_commit_to_git_repo(git_repo)
             fetch(original_uri + "#master^", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
@@ -102,13 +136,6 @@ def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
             
             fetch(original_uri + "#0", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            
-@istest
-def exception_is_thrown_if_repository_uri_is_not_recognised():
-    with temporary_directory() as directory:
-        target = os.path.join(directory, "clone")
-        original_uri = "asf+file:///tmp"
-        assert_raises(RuntimeError, lambda: fetch(original_uri, target))
         
 @contextmanager
 def temporary_git_repo():

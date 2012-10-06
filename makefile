@@ -4,7 +4,7 @@ test:
 	nosetests -m'^$$' `find tests -name '*.py'`
 
 upload:
-	cp README.md README
+	pandoc --from=markdown --to=rst README.md
 	python setup.py sdist upload
 	rm README
 	rm MANIFEST

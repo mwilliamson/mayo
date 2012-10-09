@@ -10,7 +10,7 @@ from blah.repositories import Repository
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import systems
 
-@istest
+#~ @istest
 def repository_is_used_if_uri_has_prefix():
     git = mock_vcs("git")
     hg = mock_vcs("hg")

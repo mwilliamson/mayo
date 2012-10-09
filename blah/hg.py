@@ -4,19 +4,22 @@ from blah.util import quiet_check_call, quiet_check_output
 import blah.files
 
 class Hg(object):
+    name = "hg"
+    directory_name = ".hg"
     default_branch = "default"
-    vcs_directory = ".hg"
     
     def clone(self, repository_uri, local_path):
         quiet_check_call(["hg", "clone", repository_uri, local_path])
-        return HgRepository(os.path.join(local_path, self.vcs_directory))
-        
-    def local_repo(self, local_path):
         return HgRepository(local_path)
+        
+    def local_repo(self, working_directory):
+        return HgRepository(working_directory)
 
 class HgRepository(object):
-    def __init__(self, local_path):
-        self._working_directory = blah.files.parent(local_path)
+    type = Hg.name
+    
+    def __init__(self, working_directory):
+        self._working_directory = working_directory
     
     def update(self, repository_uri):
         quiet_check_call(["hg", "pull"], cwd=self._working_directory)

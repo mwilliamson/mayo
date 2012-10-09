@@ -25,12 +25,11 @@ def hg_repository_is_returned_if_path_is_root_of_hg_repository():
         assert_equal("hg", repository.type)
         
 @istest
-def repository_path_of_git_repository_is_hidden_git_directory():
+def working_directory_of_git_repository_is_directory_above_hidden_directory():
     with temporary_directory() as directory:
-        repository_path = os.path.join(directory, ".git")
-        mkdir_p(repository_path)
+        mkdir_p(os.path.join(directory, ".git"))
         repository = find_repository(directory)
-        assert_equal(repository_path, repository.path)
+        assert_equal(directory, repository.working_directory)
         
 @istest
 def ancestors_are_searched_for_repositories():
@@ -40,4 +39,4 @@ def ancestors_are_searched_for_repositories():
         mkdir_p(repository_path)
         mkdir_p(search_path)
         repository = find_repository(search_path)
-        assert_equal(repository_path, repository.path)
+        assert_equal(directory, repository.working_directory)

@@ -6,7 +6,7 @@ from nose.tools import istest, assert_equal, assert_raises
 import mock
 
 from blah.fetcher import fetch
-from blah.repositories import Repository
+import blah.files
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import systems
 
@@ -208,3 +208,16 @@ def add_commit_to_hg_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")
     repo.execute(["add", "README"])
     repo.execute(["commit", "-mUpdating README"])
+
+_dev_null = open('/dev/null', 'w')
+
+class Repository(object):
+    def __init__(self, repo_path, repo_type):
+        self.path = repo_path
+        self.type = repo_type
+        self.working_directory = blah.files.parent(repo_path)
+        
+    def execute(self, command):
+        command = [self.type] + command
+        subprocess.check_call(command, cwd=self.working_directory,
+            stdout=_dev_null, stderr=subprocess.STDOUT)

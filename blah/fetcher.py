@@ -28,7 +28,7 @@ def fetch_with_vcs(uri, local_path, vcs):
             local_repo = vcs.local_repo(local_path)
             current_remote_uri = local_repo.remote_repo_uri()
             if current_remote_uri == repository_uri:
-                local_repo.update(repository_uri)
+                local_repo.update()
             else:
                 raise RuntimeError(
                     "Checkout directory is checkout of different URI: " + current_remote_uri +

@@ -21,7 +21,7 @@ class HgRepository(object):
     def __init__(self, working_directory):
         self.working_directory = working_directory
     
-    def update(self, repository_uri):
+    def update(self):
         quiet_check_call(["hg", "pull"], cwd=self.working_directory)
         
     def checkout_revision(self, revision):

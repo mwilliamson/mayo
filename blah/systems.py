@@ -37,7 +37,7 @@ class SourceControlSystem(object):
         else:
             revision = uri.revision
             
-        local_repo.checkout_version(revision)
+        local_repo.checkout_revision(revision)
             
     def repo(self, repo_path):
         return Repository(repo_path, self.name)

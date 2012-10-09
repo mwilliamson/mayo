@@ -21,8 +21,8 @@ class HgRepository(object):
     def update(self, repository_uri):
         quiet_check_call(["hg", "pull"], cwd=self._working_directory)
         
-    def checkout_version(self, version):
-        quiet_check_call(["hg", "update", version], cwd=self._working_directory)
+    def checkout_revision(self, revision):
+        quiet_check_call(["hg", "update", revision], cwd=self._working_directory)
         
     def current_uri(self):
         uri = quiet_check_output(["hg", "showconfig", "paths.default"], cwd=self._working_directory).strip()

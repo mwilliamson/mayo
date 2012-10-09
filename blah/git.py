@@ -21,11 +21,11 @@ class GitRepository(object):
     def update(self, repository_uri):
         quiet_check_call(_command("fetch"), cwd=self._working_directory)
 
-    def checkout_version(self, version):
-        if quiet_call(_command("branch", "-r", "--contains", "origin/" + version), cwd=self._working_directory) == 0:
-            version = "origin/" + version
+    def checkout_revision(self, revision):
+        if quiet_call(_command("branch", "-r", "--contains", "origin/" + revision), cwd=self._working_directory) == 0:
+            revision = "origin/" + revision
             
-        quiet_check_call(_command("checkout", version), cwd=self._working_directory)
+        quiet_check_call(_command("checkout", revision), cwd=self._working_directory)
 
     def current_uri(self):
         return quiet_check_output(_command("config", "remote.origin.url"), cwd=self._working_directory).strip()

@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-import blah.finder
+import blah.repositories
 import blah.fetcher
 
 def find_command(name):
@@ -10,11 +10,11 @@ def find_command(name):
 
 def what_is_this_command():
     directory = sys.argv[2] if len(sys.argv) > 2 else os.getcwd()
-    repository = blah.finder.find_repository(directory)
+    repository = blah.repositories.find_repository(directory)
     if repository is None:
         print "Could not find source control repository"
     else:
-        print "{0}+file://{1}".format(repository.type, repository.path)
+        print "{0}+file://{1}".format(repository.type, repository.working_directory)
 
 def fetch_command():
     repository_uri = sys.argv[2]

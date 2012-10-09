@@ -54,7 +54,7 @@ def can_update_git_repository_to_latest_version():
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-            add_commit_to_git_repo(git_repo)
+            add_commit_to_repo(git_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
         
@@ -64,7 +64,7 @@ def can_update_git_repository_to_specific_commit_using_hash_before_commit_name()
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_git_repo(git_repo)
+            add_commit_to_repo(git_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
@@ -77,7 +77,7 @@ def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_git_repo(git_repo)
+            add_commit_to_repo(git_repo)
             fetch(original_uri + "#master^", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
@@ -87,7 +87,7 @@ def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_git_repo(git_repo)
+            add_commit_to_repo(git_repo)
             fetch(original_uri + "#master^", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
         
@@ -101,7 +101,7 @@ def origin_is_prefixed_to_git_commit_if_necessary():
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-            add_commit_to_git_repo(git_repo)
+            add_commit_to_repo(git_repo)
             # If we checkout master rather than origin/master, we don't change revision
             fetch(original_uri + "#master", target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
@@ -152,7 +152,7 @@ def can_update_hg_repository_to_latest_version():
             fetch(original_uri, target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-            add_commit_to_hg_repo(hg_repo)
+            add_commit_to_repo(hg_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
@@ -162,7 +162,7 @@ def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
         target = os.path.join(directory, "clone")
         with temporary_hg_repo() as hg_repo:
             original_uri = "hg+file://" + hg_repo.working_directory
-            add_commit_to_hg_repo(hg_repo)
+            add_commit_to_repo(hg_repo)
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
@@ -189,11 +189,6 @@ def temporary_git_repo():
         repository.execute(["commit", "-mAdding README"])
         yield repository
 
-def add_commit_to_git_repo(repo):
-    write_file(os.path.join(repo.working_directory, "README"), "Run away!")
-    repo.execute(["add", "README"])
-    repo.execute(["commit", "-mUpdating README"])
-        
 @contextmanager
 def temporary_hg_repo():
     with temporary_directory() as path:
@@ -204,7 +199,7 @@ def temporary_hg_repo():
         repository.execute(["commit", "-mAdding README"])
         yield repository
 
-def add_commit_to_hg_repo(repo):
+def add_commit_to_repo(repo):
     write_file(os.path.join(repo.working_directory, "README"), "Run away!")
     repo.execute(["add", "README"])
     repo.execute(["commit", "-mUpdating README"])

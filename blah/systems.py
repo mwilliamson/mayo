@@ -1,14 +1,14 @@
 import os
 
 from blah.repositories import Repository
-from blah.git import GitFetcher
-from blah.hg import HgFetcher
+from blah.git import Git
+from blah.hg import Hg
 
 class SourceControlSystem(object):
-    def __init__(self, name, fetcher):
+    def __init__(self, name, vcs):
         self.name = name
         self.vcs_directory = "." + name
-        self._fetcher = fetcher
+        self._vcs = vcs
         
     def fetch(self, uri, local_path):
         repository_uri = uri.repo_uri
@@ -20,28 +20,29 @@ class SourceControlSystem(object):
             elif not os.path.isdir(vcs_directory):
                 raise RuntimeError("VCS directory doesn't exist: " + vcs_directory)
             else:
-                current_uri = self._fetcher.current_uri(local_path)
+                local_repo = self._vcs.local_repo(vcs_directory)
+                current_uri = local_repo.current_uri()
                 if current_uri == repository_uri:
-                    self._fetcher.update(repository_uri, local_path)
+                    local_repo.update(repository_uri)
                 else:
                     raise RuntimeError(
                         "Checkout directory is checkout of different URI: " + current_uri +
                         "\nExpected: " + repository_uri
                     )
         else:
-            self._fetcher.clone(repository_uri, local_path)
+            local_repo = self._vcs.clone(repository_uri, local_path)
             
         if uri.revision is None:
-            revision = self._fetcher.default_branch
+            revision = self._vcs.default_branch
         else:
             revision = uri.revision
             
-        self._fetcher.checkout_version(local_path, revision)
+        local_repo.checkout_version(revision)
             
     def repo(self, repo_path):
         return Repository(repo_path, self.name)
 
 all_systems = [
-    SourceControlSystem("git", GitFetcher()),
-    SourceControlSystem("hg", HgFetcher())
+    SourceControlSystem("git", Git()),
+    SourceControlSystem("hg", Hg())
 ]

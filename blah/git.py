@@ -30,7 +30,7 @@ class GitRepository(object):
             
         quiet_check_call(_command("checkout", revision), cwd=self.working_directory)
 
-    def current_uri(self):
+    def remote_repo_uri(self):
         return quiet_check_output(_command("config", "remote.origin.url"), cwd=self.working_directory).strip()
 
 def _command(command, *args):

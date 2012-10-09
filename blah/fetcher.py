@@ -26,12 +26,12 @@ def fetch_with_vcs(uri, local_path, vcs):
             raise RuntimeError("VCS directory doesn't exist: " + vcs_directory)
         else:
             local_repo = vcs.local_repo(local_path)
-            current_uri = local_repo.current_uri()
-            if current_uri == repository_uri:
+            current_remote_uri = local_repo.remote_repo_uri()
+            if current_remote_uri == repository_uri:
                 local_repo.update(repository_uri)
             else:
                 raise RuntimeError(
-                    "Checkout directory is checkout of different URI: " + current_uri +
+                    "Checkout directory is checkout of different URI: " + current_remote_uri +
                     "\nExpected: " + repository_uri
                 )
     else:

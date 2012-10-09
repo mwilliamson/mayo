@@ -27,7 +27,7 @@ class HgRepository(object):
     def checkout_revision(self, revision):
         quiet_check_call(["hg", "update", revision], cwd=self._working_directory)
         
-    def current_uri(self):
+    def remote_repo_uri(self):
         uri = quiet_check_output(["hg", "showconfig", "paths.default"], cwd=self._working_directory).strip()
         # Mercurial strips off "file:///" from the URI
         if _is_local(uri):

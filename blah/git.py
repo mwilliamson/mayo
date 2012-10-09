@@ -32,6 +32,9 @@ class GitRepository(object):
 
     def remote_repo_uri(self):
         return quiet_check_output(_command("config", "remote.origin.url"), cwd=self.working_directory).strip()
+        
+    def head_revision(self):
+        return quiet_check_output(_command("rev-parse", "HEAD"), cwd=self.working_directory).strip()
 
 def _command(command, *args):
     return ["git", command] + list(args)

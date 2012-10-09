@@ -10,7 +10,7 @@ setup(
     name='blah',
     version='0.1.2',
     description='Thin wrapper around source control systems',
-    long_description=read("README.md"),
+    long_description=read("README"),
     author='Michael Williamson',
     url='http://github.com/mwilliamson/blah',
     scripts=["scripts/blah"],

@@ -10,6 +10,8 @@ import blah.files
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import systems
 
+from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
+
 #~ @istest
 def repository_is_used_if_uri_has_prefix():
     git = mock_vcs("git")
@@ -178,41 +180,3 @@ def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
                 fetch("hg+file://" + first_repo.working_directory, target)
                 assert_raises(RuntimeError,
                     lambda: fetch("hg+file://" + second_repo.working_directory, target))
-        
-@contextmanager
-def temporary_git_repo():
-    with temporary_directory() as path:
-        repository = Repository(os.path.join(path, ".git"), "git")
-        repository.execute(["init"])
-        write_file(os.path.join(path, "README"), "Run it.")
-        repository.execute(["add", "README"])
-        repository.execute(["commit", "-mAdding README"])
-        yield repository
-
-@contextmanager
-def temporary_hg_repo():
-    with temporary_directory() as path:
-        repository = Repository(os.path.join(path, ".hg"), "hg")
-        repository.execute(["init"])
-        write_file(os.path.join(path, "README"), "Run it.")
-        repository.execute(["add", "README"])
-        repository.execute(["commit", "-mAdding README"])
-        yield repository
-
-def add_commit_to_repo(repo):
-    write_file(os.path.join(repo.working_directory, "README"), "Run away!")
-    repo.execute(["add", "README"])
-    repo.execute(["commit", "-mUpdating README"])
-
-_dev_null = open('/dev/null', 'w')
-
-class Repository(object):
-    def __init__(self, repo_path, repo_type):
-        self.path = repo_path
-        self.type = repo_type
-        self.working_directory = blah.files.parent(repo_path)
-        
-    def execute(self, command):
-        command = [self.type] + command
-        subprocess.check_call(command, cwd=self.working_directory,
-            stdout=_dev_null, stderr=subprocess.STDOUT)

@@ -18,7 +18,11 @@ def repository_is_used_if_uri_has_prefix():
     
     fetch("git+" + git_uri, "/tmp/project", systems=[hg, git])
     
-    git.fetch.assert_called_once_with(git_uri, "/tmp/project")
+    git.fetch.assert_called_once_with(mock.ANY, "/tmp/project")
+    uri_arg = git.fetch.call_args[0][0]
+    assert_equal("git", uri_arg.vcs)
+    assert_equal(git_uri, uri_arg.repo_uri)
+    assert_equal(None, uri_arg.revision)
     
 def mock_vcs(name):
     vcs = mock.Mock()

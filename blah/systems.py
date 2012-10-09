@@ -10,12 +10,9 @@ class SourceControlSystem(object):
         self.vcs_directory = "." + name
         self._fetcher = fetcher
         
-    def fetch(self, repository_uri, local_path):
-        if "#" in repository_uri:
-            repository_uri, version = repository_uri.split("#")
-        else:
-            version = self._fetcher.default_branch
-            
+    def fetch(self, uri, local_path):
+        repository_uri = uri.repo_uri
+        
         if os.path.exists(local_path):
             vcs_directory = os.path.join(local_path, self.vcs_directory)
             if not os.path.isdir(local_path):
@@ -33,7 +30,13 @@ class SourceControlSystem(object):
                     )
         else:
             self._fetcher.clone(repository_uri, local_path)
-        self._fetcher.checkout_version(local_path, version)
+            
+        if uri.revision is None:
+            revision = self._fetcher.default_branch
+        else:
+            revision = uri.revision
+            
+        self._fetcher.checkout_version(local_path, revision)
             
     def repo(self, repo_path):
         return Repository(repo_path, self.name)

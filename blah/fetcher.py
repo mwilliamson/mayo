@@ -1,13 +1,15 @@
 import blah.systems
+import blah.uri_parser
 
-def fetch(repository_uri, local_path, systems=None):
+def fetch(uri_str, local_path, systems=None):
     if systems is None:
         systems = blah.systems.all_systems
-        
+    
+    uri = blah.uri_parser.parse(uri_str)
+    
     for system in systems:
-        prefix = system.name + "+"
-        if repository_uri.startswith(prefix):
-            return system.fetch(repository_uri[len(prefix):], local_path)
+        if uri.vcs == system.name:
+            return system.fetch(uri, local_path)
             
-    raise RuntimeError("Source control system not recognised: " + repository_uri)
+    raise RuntimeError("Source control system not recognised: " + uri.vcs)
         

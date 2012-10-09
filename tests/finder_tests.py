@@ -3,7 +3,7 @@ import os
 from nose.tools import istest, assert_equal
 
 from blah.finder import find_repository
-from tests.files import mkdir_p, temporary_directory
+from blah.files import mkdir_p, temporary_directory
 
 @istest
 def none_is_returned_if_there_is_no_repository():

@@ -7,7 +7,7 @@ import mock
 
 from blah.fetcher import fetch
 from blah.repositories import Repository
-from tests.files import mkdir_p, temporary_directory, write_file, read_file
+from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import systems
 
 @istest

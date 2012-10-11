@@ -5,24 +5,30 @@ import sys
 import blah.repositories
 import blah.fetcher
 
-def find_command(name):
-    return commands[name]
+class WhatIsThisCommand(object):
+    def create_parser(self, subparser):
+        subparser.add_argument("directory", nargs="?")
+    
+    def execute(self, args):
+        directory = args.directory if args.directory is not None else os.getcwd()
+        repository = blah.repositories.find_repository(directory)
+        if repository is None:
+            print "Could not find source control repository"
+        else:
+            print "{0}+file://{1}".format(repository.type, repository.working_directory)
 
-def what_is_this_command():
-    directory = sys.argv[2] if len(sys.argv) > 2 else os.getcwd()
-    repository = blah.repositories.find_repository(directory)
-    if repository is None:
-        print "Could not find source control repository"
-    else:
-        print "{0}+file://{1}".format(repository.type, repository.working_directory)
+what_is_this_command = WhatIsThisCommand()
 
-def fetch_command():
-    repository_uri = sys.argv[2]
-    local_path = sys.argv[3]
-    blah.fetcher.fetch(repository_uri, local_path)
+class FetchCommand(object):
+    def create_parser(self, subparser):
+        subparser.add_argument("repository_uri", metavar="repository-uri")
+        subparser.add_argument("local_path", metavar="local-path")
+    
+    def execute(self, args):
+        blah.fetcher.fetch(args.repository_uri, args.local_path)
 
 commands = {
     "whatisthis": what_is_this_command,
     "what-is-this": what_is_this_command,
-    "fetch": fetch_command
+    "fetch": FetchCommand()
 }

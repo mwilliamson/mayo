@@ -1,7 +1,4 @@
-import os
-
 from blah.util import quiet_check_call, quiet_call, quiet_check_output
-import blah.files
 
 class Git(object):
     name = "git"

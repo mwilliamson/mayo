@@ -1,6 +1,4 @@
 import os
-import subprocess
-import sys
 
 import blah.repositories
 import blah.fetcher

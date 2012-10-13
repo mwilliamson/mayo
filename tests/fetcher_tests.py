@@ -1,14 +1,10 @@
 import os
-import subprocess
-from contextlib import contextmanager
 
 from nose.tools import istest, assert_equal, assert_raises
 import mock
 
 from blah.fetcher import fetch
-import blah.files
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
-from blah import systems
 
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 
@@ -70,16 +66,6 @@ def can_update_git_repository_to_specific_commit_using_hash_before_commit_name()
             fetch(original_uri, target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
-            fetch(original_uri + "#master^", target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            
-@istest
-def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
-    with temporary_directory() as directory:
-        target = os.path.join(directory, "clone")
-        with temporary_git_repo() as git_repo:
-            original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_repo(git_repo)
             fetch(original_uri + "#master^", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             

@@ -3,13 +3,15 @@ import os
 import blah.systems
 import blah.uri_parser
 
-def fetch(uri_str, local_path, systems=None):
+def fetch(uri_str, local_path, use_cache=False, systems=None):
     if systems is None:
         systems = blah.systems.all_systems
     
     uri = blah.uri_parser.parse(uri_str)
     
     vcs = _find_vcs(uri, systems)
+    if use_cache and getattr(vcs, "supports_caching", False):
+        vcs = vcs.use_cache()
     local_repo = _fetch_all_revisions(uri, local_path, vcs)
     revision = _read_revision(vcs, uri)
     local_repo.checkout_revision(revision)

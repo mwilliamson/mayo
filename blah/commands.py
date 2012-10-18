@@ -21,9 +21,10 @@ class FetchCommand(object):
     def create_parser(self, subparser):
         subparser.add_argument("repository_uri", metavar="repository-uri")
         subparser.add_argument("local_path", metavar="local-path")
+        subparser.add_argument("--use-cache", default=False)
     
     def execute(self, args):
-        blah.fetcher.fetch(args.repository_uri, args.local_path)
+        blah.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
 
 commands = {
     "whatisthis": what_is_this_command,

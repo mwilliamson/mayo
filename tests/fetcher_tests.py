@@ -95,6 +95,18 @@ def origin_is_prefixed_to_git_commit_if_necessary():
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
 @istest
+def can_use_cache_when_cloning_git_repository():
+    with temporary_directory() as directory:
+        with temporary_directory() as blah_cache:
+            os.environ["BLAH_CACHE"] = blah_cache
+            target = os.path.join(directory, "clone")
+            with temporary_git_repo() as git_repo:
+                original_uri = "git+file://" + git_repo.working_directory
+                add_commit_to_repo(git_repo)
+                fetch(original_uri + "#master^", target, use_cache=True)
+                assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+@istest
 def error_is_raised_if_target_is_file():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")

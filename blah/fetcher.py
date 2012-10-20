@@ -2,6 +2,7 @@ import os
 
 import blah.systems
 import blah.uri_parser
+import blah.errors
 
 def fetch(uri_str, local_path, use_cache=False, systems=None):
     if systems is None:
@@ -21,7 +22,7 @@ def _find_vcs(uri, systems):
         if uri.vcs == vcs.name:
             return vcs
             
-    raise RuntimeError("Source control system not recognised: " + uri.vcs)
+    raise blah.errors.UnrecognisedSourceControlSystem("Source control system not recognised: " + uri.vcs)
 
 def _fetch_all_revisions(uri, local_path, vcs):
     if os.path.exists(local_path):

@@ -5,6 +5,7 @@ import mock
 
 from blah.fetcher import fetch
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
+from blah import UnrecognisedSourceControlSystem
 
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 
@@ -32,7 +33,7 @@ def error_is_raised_if_repository_uri_is_not_recognised():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
         original_uri = "asf+file:///tmp"
-        assert_raises(RuntimeError, lambda: fetch(original_uri, target))
+        assert_raises(UnrecognisedSourceControlSystem, lambda: fetch(original_uri, target))
 
 @istest
 def can_fetch_git_repository_into_new_directory():

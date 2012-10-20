@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='blah',
-    version='0.1.4',
+    version='0.1.5',
     description='Thin wrapper around source control systems',
     long_description=read("README"),
     author='Michael Williamson',

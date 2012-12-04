@@ -17,16 +17,17 @@ def _quiet_subprocess_eval(func, args, kwargs):
 
 def run(command, cwd=None, allow_error=False):
     try:
-        process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=_dev_null)
+        process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except OSError as error:
         raise NoSuchCommandError(command[0])
         
-    output, unused_err = process.communicate()
+    output, stderr_output = process.communicate()
     return_code = process.poll()
     result = ExecutionResult(return_code, output)
     if not allow_error and return_code:
         error = subprocess.CalledProcessError(return_code, command)
         error.output = output
+        error.stderr_output = stderr_output
         raise error
     return result
 

@@ -103,15 +103,18 @@ def can_update_repository_to_specific_commit_using_hash_before_commit_name(vcs, 
         fetch("{0}#{1}".format(original_uri, commit), target)
         assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-@istest
-def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
-    with temporary_directory() as directory:
-        target = os.path.join(directory, "clone")
-        with temporary_git_repo() as git_repo:
-            original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_repo(git_repo)
-            fetch(original_uri + "#master^", target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+@vcs_agnostic_test(
+    params=("commit", ),
+    git_params={"commit": "master^"},
+    hg_params={"commit": "0"}
+)
+def can_clone_repository_to_specific_commit_using_hash_before_commit_name(vcs, temp_dir, commit):
+    target = os.path.join(temp_dir, "clone")
+    with vcs.temporary_repo() as repo:
+        original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
+        add_commit_to_repo(repo)
+        fetch("{0}#{1}".format(original_uri, commit), target)
+        assert_equal("Run it.", read_file(os.path.join(target, "README")))
         
 @istest
 def origin_is_prefixed_to_git_commit_if_necessary():

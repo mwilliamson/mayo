@@ -128,7 +128,11 @@ def git_fetch_raises_error_if_target_is_not_git_repository():
         mkdir_p(target)
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
-            assert_raises(RuntimeError, lambda: fetch(original_uri, target))
+            assert_raises_message(
+                BlahUserError,
+                "{0} already exists and is not a git repository".format(target),
+                lambda: fetch(original_uri, target)
+            )
             
 @istest
 def git_fetch_raises_error_if_target_is_checkout_of_different_repository():

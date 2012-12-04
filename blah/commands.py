@@ -3,6 +3,7 @@ import argparse
 
 import blah.repositories
 import blah.fetcher
+import blah.errors
 
 class WhatIsThisCommand(object):
     def create_parser(self, subparser):
@@ -25,7 +26,11 @@ class FetchCommand(object):
         subparser.add_argument("--use-cache", default=False, help=argparse.SUPPRESS, action="store_true")
     
     def execute(self, args):
-        blah.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
+        try:
+            blah.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
+        except blah.errors.BlahUserError as error:
+            print "fetch failed: {0}".format(error.message)
+            exit(-1)
 
 commands = {
     "whatisthis": what_is_this_command,

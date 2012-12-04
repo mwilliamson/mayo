@@ -2,31 +2,30 @@ import subprocess
 
 _dev_null = open('/dev/null', 'w')
 
-def quiet_check_call(*args, **kwargs):
-    return _quiet_subprocess_eval(subprocess.check_call, args, kwargs)
+def quiet_check_call(command, cwd=None):
+    return run(command, cwd=cwd).return_code
 
-def quiet_call(*args, **kwargs):
-    return _quiet_subprocess_eval(subprocess.call, args, kwargs)
+def quiet_call(command, cwd=None):
+    return run(command, cwd=cwd, allow_error=True).return_code
     
-def quiet_check_output(*args, **kwargs):
-    return _check_output(*args, stderr=_dev_null, **kwargs)
+def quiet_check_output(command, cwd):
+    return run(command, cwd=cwd).output
     
 def _quiet_subprocess_eval(func, args, kwargs):
     return func(*args, stdout=_dev_null, stderr=subprocess.STDOUT, **kwargs)
 
-def _check_output(*popenargs, **kwargs):
-    r"""Run command with arguments and return its output as a byte string.
-
-Backported from Python 2.7 as it's implemented as pure python on stdlib.
-"""
-    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+def run(command, cwd=None, allow_error=False):
+    process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=_dev_null)
     output, unused_err = process.communicate()
-    retcode = process.poll()
-    if retcode:
-        cmd = kwargs.get("args")
-        if cmd is None:
-            cmd = popenargs[0]
-        error = subprocess.CalledProcessError(retcode, cmd)
+    return_code = process.poll()
+    result = ExecutionResult(return_code, output)
+    if not allow_error and return_code:
+        error = subprocess.CalledProcessError(return_code, command)
         error.output = output
         raise error
-    return output
+    return result
+
+class ExecutionResult(object):
+    def __init__(self, return_code, output):
+        self.return_code = return_code
+        self.output = output

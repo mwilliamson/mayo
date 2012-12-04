@@ -2,7 +2,7 @@ import os
 import os.path
 import hashlib
 
-from blah.util import quiet_check_call, quiet_call, quiet_check_output
+from blah.util import run
 
 class Git(object):
     name = "git"
@@ -19,16 +19,13 @@ class Git(object):
     def clone(self, repository_uri, local_path):
         if self._use_cache:
             cache_dir = self._update_cache(repository_uri)
-            quiet_check_call(_command("clone", repository_uri, local_path, "--reference", cache_dir))
-            quiet_check_call(_command("repack", "-a"), cwd=local_path)
-            quiet_check_call(
-                _command("submodule", "foreach", "git", "repack", "-a"),
-                cwd=local_path
-            )
+            _git(["clone", repository_uri, local_path, "--reference", cache_dir])
+            _git(["repack", "-a"], cwd=local_path)
+            _git(["submodule", "foreach", "git", "repack", "-a"], cwd=local_path)
             
             os.remove(os.path.join(local_path, ".git/objects/info/alternates"))
         else:
-            quiet_check_call(_command("clone", repository_uri, local_path))
+            _git(["clone", repository_uri, local_path])
         return GitRepository(local_path)
         
     def local_repo(self, working_directory):
@@ -40,9 +37,9 @@ class Git(object):
         cache_repo = os.path.join(cache_dir, repo_hash)
         
         if os.path.exists(cache_repo):
-            quiet_check_call(_command("fetch"), cwd=cache_repo)
+            _git(["fetch"], cwd=cache_repo)
         else:
-            quiet_check_call(_command("clone", repository_uri, cache_repo))
+            _git(["clone", repository_uri, cache_repo])
             
         return cache_repo
 
@@ -53,19 +50,20 @@ class GitRepository(object):
         self.working_directory = working_directory
     
     def update(self):
-        quiet_check_call(_command("fetch"), cwd=self.working_directory)
+        _git(["fetch"], cwd=self.working_directory)
 
     def checkout_revision(self, revision):
-        if quiet_call(_command("branch", "-r", "--contains", "origin/" + revision), cwd=self.working_directory) == 0:
+        if _git(["branch", "-r", "--contains", "origin/" + revision], cwd=self.working_directory, allow_error=True).return_code == 0:
             revision = "origin/" + revision
             
-        quiet_check_call(_command("checkout", revision), cwd=self.working_directory)
+        _git(["checkout", revision], cwd=self.working_directory)
 
     def remote_repo_uri(self):
-        return quiet_check_output(_command("config", "remote.origin.url"), cwd=self.working_directory).strip()
+        return _git(["config", "remote.origin.url"], cwd=self.working_directory).output.strip()
         
     def head_revision(self):
-        return quiet_check_output(_command("rev-parse", "HEAD"), cwd=self.working_directory).strip()
+        return _git(["rev-parse", "HEAD"], cwd=self.working_directory).output.strip()
 
-def _command(command, *args):
-    return ["git", command] + list(args)
+def _git(git_command, *args, **kwargs):
+    command = ["git"] + git_command
+    return run(command, *args, **kwargs)

@@ -39,7 +39,7 @@ def _read_revision(vcs, uri):
 def _update(repository_uri, local_path, vcs):
     vcs_directory = os.path.join(local_path, vcs.directory_name)
     if not os.path.isdir(local_path):
-        raise RuntimeError("Checkout path already exists, and is not directory: " + local_path)
+        raise blah.errors.BlahUserError("Checkout path already exists, and is not directory: " + local_path)
     elif not os.path.isdir(vcs_directory):
         message = "{0} already exists and is not a git repository".format(local_path)
         raise blah.errors.BlahUserError(message)

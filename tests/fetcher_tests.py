@@ -1,6 +1,6 @@
 import os
 
-from nose.tools import istest, assert_equal, assert_raises
+from nose.tools import istest, assert_equal
 import mock
 
 from blah.fetcher import fetch
@@ -119,7 +119,11 @@ def error_is_raised_if_target_is_file():
         write_file(target, "Nope")
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
-            assert_raises(RuntimeError, lambda: fetch(original_uri, target))
+            assert_raises_message(
+                BlahUserError,
+                "Checkout path already exists, and is not directory: {0}".format(target),
+                lambda: fetch(original_uri, target)
+            )
             
 @istest
 def git_fetch_raises_error_if_target_is_not_git_repository():

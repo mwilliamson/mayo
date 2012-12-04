@@ -12,13 +12,20 @@ from blah.errors import BlahUserError
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 import test_repos
 
-def vcs_agnostic_test(func):
-    @functools.wraps(func)
-    def run_test():
-        for vcs in map(VcsUnderTest, ["git", "hg"]):
-            with temporary_directory() as temp_dir:
-                yield func, vcs, temp_dir
-    return istest(run_test)
+def vcs_agnostic_test(func=None, params=(), **kwargs):
+    def wrap(func):
+        @functools.wraps(func)
+        def run_test():
+            for vcs in map(VcsUnderTest, ["git", "hg"]):
+                test_params = [kwargs["{0}_params".format(vcs.name)][param_name] for param_name in params]
+                with temporary_directory() as temp_dir:
+                    yield tuple([func, vcs, temp_dir] + test_params)
+        return istest(run_test)
+        
+    if func is not None and len(kwargs) == 0:
+        return wrap(func)
+    else:
+        return wrap
 
 class VcsUnderTest(object):
     def __init__(self, name):
@@ -26,6 +33,9 @@ class VcsUnderTest(object):
     
     def temporary_repo(self):
         return test_repos.temporary_repo(self.name)
+        
+    def __repr__(self):
+        return self.name
 
 #~ @istest
 def repository_is_used_if_uri_has_prefix():
@@ -77,18 +87,21 @@ def can_update_repository_to_latest_version(vcs, temp_dir):
         fetch(original_uri, target)
         assert_equal("Run away!", read_file(os.path.join(target, "README")))
         
-@istest
-def can_update_git_repository_to_specific_commit_using_hash_before_commit_name():
-    with temporary_directory() as directory:
-        target = os.path.join(directory, "clone")
-        with temporary_git_repo() as git_repo:
-            original_uri = "git+file://" + git_repo.working_directory
-            add_commit_to_repo(git_repo)
-            fetch(original_uri, target)
-            assert_equal("Run away!", read_file(os.path.join(target, "README")))
-            
-            fetch(original_uri + "#master^", target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+@vcs_agnostic_test(
+    params=("commit", ),
+    git_params={"commit": "master^"},
+    hg_params={"commit": "0"}
+)
+def can_update_repository_to_specific_commit_using_hash_before_commit_name(vcs, temp_dir, commit):
+    target = os.path.join(temp_dir, "clone")
+    with vcs.temporary_repo() as repo:
+        original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
+        add_commit_to_repo(repo)
+        fetch(original_uri, target)
+        assert_equal("Run away!", read_file(os.path.join(target, "README")))
+        
+        fetch("{0}#{1}".format(original_uri, commit), target)
+        assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
 @istest
 def can_clone_git_repository_to_specific_commit_using_hash_before_commit_name():
@@ -167,19 +180,6 @@ def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
                     lambda: fetch("git+file://" + second_repo.working_directory, target)
                 )
 
-@istest
-def can_update_hg_repository_to_specific_commit_using_hash_before_commit_name():
-    with temporary_directory() as directory:
-        target = os.path.join(directory, "clone")
-        with temporary_hg_repo() as hg_repo:
-            original_uri = "hg+file://" + hg_repo.working_directory
-            add_commit_to_repo(hg_repo)
-            fetch(original_uri, target)
-            assert_equal("Run away!", read_file(os.path.join(target, "README")))
-            
-            fetch(original_uri + "#0", target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            
 @istest
 def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
     with temporary_directory() as directory:

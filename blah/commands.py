@@ -28,7 +28,7 @@ class FetchCommand(object):
     def execute(self, args):
         try:
             blah.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
-        except blah.errors.BlahUserError as error:
+        except (blah.errors.BlahUserError, blah.util.NoSuchCommandError) as error:
             print "fetch failed: {0}".format(error.message)
             exit(-1)
 

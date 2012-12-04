@@ -137,8 +137,12 @@ def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
         with temporary_git_repo() as first_repo:
             with temporary_git_repo() as second_repo:
                 fetch("git+file://" + first_repo.working_directory, target)
-                assert_raises(RuntimeError,
-                    lambda: fetch("git+file://" + second_repo.working_directory, target))
+                assert_raises_message(
+                    BlahUserError,
+                    "{0} is existing checkout of different repository: file://{1}"
+                        .format(target, first_repo.working_directory),
+                    lambda: fetch("git+file://" + second_repo.working_directory, target)
+                )
 
 @istest
 def can_fetch_hg_repository_into_new_directory():

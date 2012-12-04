@@ -6,6 +6,7 @@ import mock
 from blah.fetcher import fetch
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import UnrecognisedSourceControlSystem
+from blah.errors import BlahUserError
 
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 
@@ -33,7 +34,11 @@ def error_is_raised_if_repository_uri_is_not_recognised():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
         original_uri = "asf+file:///tmp"
-        assert_raises(UnrecognisedSourceControlSystem, lambda: fetch(original_uri, target))
+        assert_raises_message(
+            UnrecognisedSourceControlSystem,
+            "Source control system not recognised: asf",
+            lambda: fetch(original_uri, target)
+        )
 
 @istest
 def can_fetch_git_repository_into_new_directory():
@@ -177,5 +182,16 @@ def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
         with temporary_hg_repo() as first_repo:
             with temporary_hg_repo() as second_repo:
                 fetch("hg+file://" + first_repo.working_directory, target)
-                assert_raises(RuntimeError,
-                    lambda: fetch("hg+file://" + second_repo.working_directory, target))
+                assert_raises_message(
+                    BlahUserError,
+                    "{0} is existing checkout of different repository: file://{1}"
+                        .format(target, first_repo.working_directory),
+                    lambda: fetch("hg+file://" + second_repo.working_directory, target)
+                )
+
+def assert_raises_message(expected_error_type, expected_message, func):
+    try:
+        func()
+        assert False
+    except expected_error_type as error:
+        assert_equal(expected_message, error.message)

@@ -49,8 +49,7 @@ def _update(repository_uri, local_path, vcs):
             local_repo.update()
             return local_repo
         else:
-            raise RuntimeError(
-                "Checkout directory is checkout of different URI: " + current_remote_uri +
-                "\nExpected: " + repository_uri
-            )
+            message = "{0} is existing checkout of different repository: {1}" \
+                .format(local_path, current_remote_uri)
+            raise blah.errors.BlahUserError(message)
     

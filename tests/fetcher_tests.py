@@ -1,12 +1,13 @@
 import os
 import functools
 
-from nose.tools import istest, assert_equal
+from nose.tools import istest, assert_equal, assert_false
 
 from blah.fetcher import fetch
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import UnrecognisedSourceControlSystem
 from blah.errors import BlahUserError
+from blah.systems import all_systems
 
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 import test_repos
@@ -15,7 +16,7 @@ def vcs_agnostic_test(func=None, params=(), **kwargs):
     def wrap(func):
         @functools.wraps(func)
         def run_test():
-            for vcs in map(VcsUnderTest, ["git", "hg"]):
+            for vcs in map(VcsUnderTest, all_systems):
                 test_params = [kwargs["{0}_params".format(vcs.name)][param_name] for param_name in params]
                 with temporary_directory() as temp_dir:
                     yield tuple([func, vcs, temp_dir] + test_params)
@@ -27,8 +28,16 @@ def vcs_agnostic_test(func=None, params=(), **kwargs):
         return wrap
 
 class VcsUnderTest(object):
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, vcs):
+        self.vcs = vcs
+        
+    @property
+    def name(self):
+        return self.vcs.name
+        
+    @property
+    def directory_name(self):
+        return self.vcs.directory_name
     
     def temporary_repo(self):
         return test_repos.temporary_repo(self.name)
@@ -114,6 +123,16 @@ def can_clone_repository_to_specific_commit_using_hash_before_commit_name(vcs, t
         add_commit_to_repo(repo)
         fetch("{0}#{1}".format(original_uri, commit), target)
         assert_equal("Run it.", read_file(os.path.join(target, "README")))
+        
+
+@vcs_agnostic_test
+def can_fetch_repo_without_vcs_files(vcs, temp_dir):
+    target = os.path.join(temp_dir, "clone")
+    with vcs.temporary_repo() as repo:
+        original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
+        fetch(original_uri, target, archive=True)
+        assert_equal("Run it.", read_file(os.path.join(target, "README")))
+        assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
         
 @istest
 def origin_is_prefixed_to_git_commit_if_necessary():

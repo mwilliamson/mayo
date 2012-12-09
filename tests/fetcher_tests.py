@@ -2,7 +2,6 @@ import os
 import functools
 
 from nose.tools import istest, assert_equal
-import mock
 
 from blah.fetcher import fetch
 from blah.files import mkdir_p, temporary_directory, write_file, read_file

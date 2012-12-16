@@ -2,7 +2,10 @@ import os
 import os.path
 import hashlib
 
+from xdg.BaseDirectory import save_cache_path
+
 from blah.util import run
+
 
 class Git(object):
     name = "git"
@@ -32,7 +35,7 @@ class Git(object):
         return GitRepository(working_directory)
         
     def _update_cache(self, repository_uri):
-        cache_dir = os.environ.get("BLAH_CACHE_DIR", os.path.expanduser("~/.cache/blah"))
+        cache_dir = os.environ.get("BLAH_CACHE_DIR", save_cache_path("blah"))
         repo_hash = hashlib.sha1(repository_uri).hexdigest()
         cache_repo = os.path.join(cache_dir, repo_hash)
         

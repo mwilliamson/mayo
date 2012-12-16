@@ -1,5 +1,6 @@
 import os
 import functools
+import contextlib
 
 from nose.tools import istest, assert_equal, assert_false
 
@@ -151,15 +152,13 @@ def origin_is_prefixed_to_git_commit_if_necessary():
             
 @istest
 def can_use_cache_when_cloning_git_repository():
-    with temporary_directory() as directory:
-        with temporary_directory() as blah_cache:
-            os.environ["BLAH_CACHE"] = blah_cache
-            target = os.path.join(directory, "clone")
-            with temporary_git_repo() as git_repo:
-                original_uri = "git+file://" + git_repo.working_directory
-                add_commit_to_repo(git_repo)
-                fetch(original_uri + "#master^", target, use_cache=True)
-                assert_equal("Run it.", read_file(os.path.join(target, "README")))
+    with temporary_directory() as directory, temporary_xdg_cache_dir():
+        target = os.path.join(directory, "clone")
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            add_commit_to_repo(git_repo)
+            fetch(original_uri + "#master^", target, use_cache=True)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
 @istest
 def error_is_raised_if_target_is_file():
@@ -221,3 +220,18 @@ def assert_raises_message(expected_error_type, expected_message, func):
         assert False
     except expected_error_type as error:
         assert_equal(expected_message, error.message)
+
+
+@contextlib.contextmanager
+def temporary_xdg_cache_dir():
+    key = "XDG_CACHE_HOME"
+    with temporary_directory() as cache_dir:
+        original_value = os.environ.get(key)
+        try:
+            os.environ[key] = cache_dir
+            yield
+        finally:
+            if original_value is None:
+                del os.environ[key]
+            else:
+                os.environ[key] = original_value

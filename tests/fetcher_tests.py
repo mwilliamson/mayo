@@ -16,9 +16,9 @@ import test_repos
 
 def test(func):
     @functools.wraps(func)
-    def run_test():
+    def run_test(*args, **kwargs):
         with temporary_xdg_cache_dir():
-            return func()
+            return func(*args, **kwargs)
     return istest(run_test)
 
 
@@ -29,8 +29,8 @@ def vcs_agnostic_test(func=None, params=(), **kwargs):
             for vcs in map(VcsUnderTest, all_systems):
                 test_params = [kwargs["{0}_params".format(vcs.name)][param_name] for param_name in params]
                 with temporary_directory() as temp_dir:
-                    yield tuple([func, vcs, temp_dir] + test_params)
-        return test(run_test)
+                    yield tuple([test(func), vcs, temp_dir] + test_params)
+        return istest(run_test)
         
     if func is not None and len(kwargs) == 0:
         return wrap(func)

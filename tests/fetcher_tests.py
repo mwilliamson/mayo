@@ -13,6 +13,15 @@ from blah.systems import all_systems
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
 import test_repos
 
+
+def test(func):
+    @functools.wraps(func)
+    def run_test():
+        with temporary_xdg_cache_dir():
+            return func()
+    return istest(run_test)
+
+
 def vcs_agnostic_test(func=None, params=(), **kwargs):
     def wrap(func):
         @functools.wraps(func)
@@ -21,12 +30,13 @@ def vcs_agnostic_test(func=None, params=(), **kwargs):
                 test_params = [kwargs["{0}_params".format(vcs.name)][param_name] for param_name in params]
                 with temporary_directory() as temp_dir:
                     yield tuple([func, vcs, temp_dir] + test_params)
-        return istest(run_test)
+        return test(run_test)
         
     if func is not None and len(kwargs) == 0:
         return wrap(func)
     else:
         return wrap
+
 
 class VcsUnderTest(object):
     def __init__(self, vcs):
@@ -46,7 +56,7 @@ class VcsUnderTest(object):
     def __repr__(self):
         return self.name
 
-#~ @istest
+#~ @test
 def repository_is_used_if_uri_has_prefix():
     git = mock_vcs("git")
     hg = mock_vcs("hg")
@@ -65,7 +75,7 @@ def mock_vcs(name):
     vcs.name = name
     return vcs
 
-@istest
+@test
 def error_is_raised_if_repository_uri_is_not_recognised():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
@@ -128,15 +138,14 @@ def can_clone_repository_to_specific_commit_using_hash_before_commit_name(vcs, t
 
 @vcs_agnostic_test
 def can_fetch_repo_without_vcs_files(vcs, temp_dir):
-    with temporary_xdg_cache_dir():
-        target = os.path.join(temp_dir, "clone")
-        with vcs.temporary_repo() as repo:
-            original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
-            archive(original_uri, target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
+    target = os.path.join(temp_dir, "clone")
+    with vcs.temporary_repo() as repo:
+        original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
+        archive(original_uri, target)
+        assert_equal("Run it.", read_file(os.path.join(target, "README")))
+        assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
         
-@istest
+@test
 def origin_is_prefixed_to_git_commit_if_necessary():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
@@ -151,9 +160,9 @@ def origin_is_prefixed_to_git_commit_if_necessary():
             fetch(original_uri + "#master", target)
             assert_equal("Run away!", read_file(os.path.join(target, "README")))
             
-@istest
+@test
 def can_use_cache_when_cloning_git_repository():
-    with temporary_directory() as directory, temporary_xdg_cache_dir():
+    with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
@@ -161,23 +170,22 @@ def can_use_cache_when_cloning_git_repository():
             fetch(original_uri + "#master^", target, use_cache=True)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-@istest
+@test
 def remote_connection_is_not_required_when_archiving_cached_tagged_commit():
-    with temporary_xdg_cache_dir():
-        with temporary_git_repo() as git_repo:
-            original_uri = "git+file://" + git_repo.working_directory
-            tag_git_repo(git_repo, "0.1")
-            add_commit_to_repo(git_repo)
-            with temporary_directory() as directory:
-                target = os.path.join(directory, "clone")
-                archive(original_uri + "#0.1", target)
-        
+    with temporary_git_repo() as git_repo:
+        original_uri = "git+file://" + git_repo.working_directory
+        tag_git_repo(git_repo, "0.1")
+        add_commit_to_repo(git_repo)
         with temporary_directory() as directory:
             target = os.path.join(directory, "clone")
             archive(original_uri + "#0.1", target)
-            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+    
+    with temporary_directory() as directory:
+        target = os.path.join(directory, "clone")
+        archive(original_uri + "#0.1", target)
+        assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
-@istest
+@test
 def error_is_raised_if_target_is_file():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
@@ -190,7 +198,7 @@ def error_is_raised_if_target_is_file():
                 lambda: fetch(original_uri, target)
             )
             
-@istest
+@test
 def git_fetch_raises_error_if_target_is_not_git_repository():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
@@ -203,7 +211,7 @@ def git_fetch_raises_error_if_target_is_not_git_repository():
                 lambda: fetch(original_uri, target)
             )
             
-@istest
+@test
 def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")
@@ -217,7 +225,7 @@ def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
                     lambda: fetch("git+file://" + second_repo.working_directory, target)
                 )
 
-@istest
+@test
 def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
     with temporary_directory() as directory:
         target = os.path.join(directory, "clone")

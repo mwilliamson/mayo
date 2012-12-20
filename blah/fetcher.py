@@ -10,13 +10,20 @@ import blah.caching
 def archive(uri_str, local_path):
     uri_hash = _sha1(uri_str)
     cache_dir = os.path.join(blah.caching.cache_root(), "archive", uri_hash)
-    if not os.path.exists(os.path.dirname(cache_dir)):
-        os.makedirs(os.path.dirname(cache_dir))
-    if not os.path.exists(cache_dir):
-        vcs = _fetch(uri_str, cache_dir)
-        shutil.rmtree(os.path.join(cache_dir, vcs.directory_name))
-    
-    shutil.copytree(cache_dir, local_path)
+    if os.path.exists(cache_dir):
+        shutil.copytree(cache_dir, local_path)
+    else:
+        uri = blah.uri_parser.parse(uri_str)
+        
+        vcs, local_repo = _fetch(uri_str, local_path)
+        is_fixed_revision = local_repo.is_fixed_revision(uri.revision)
+        shutil.rmtree(os.path.join(local_path, vcs.directory_name))
+        
+        if is_fixed_revision:
+            if not os.path.exists(os.path.dirname(cache_dir)):
+                os.makedirs(os.path.dirname(cache_dir))
+            
+            shutil.copytree(local_path, cache_dir)
 
 def _sha1(value):
     return hashlib.sha1(value).hexdigest()
@@ -37,7 +44,7 @@ def _fetch(uri_str, local_path, use_cache=False, systems=None):
     local_repo = _fetch_all_revisions(uri, local_path, vcs)
     revision = _read_revision(vcs, uri)
     local_repo.checkout_revision(revision)
-    return vcs
+    return vcs, local_repo
 
 def _find_vcs(uri, systems):
     for vcs in systems:

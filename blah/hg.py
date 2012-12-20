@@ -11,6 +11,7 @@ class Hg(object):
         
     def local_repo(self, working_directory):
         return HgRepository(working_directory)
+    
 
 class HgRepository(object):
     type = Hg.name
@@ -34,6 +35,10 @@ class HgRepository(object):
             
     def head_revision(self):
         return quiet_check_output(["hg", "parents", "--template={node}"], cwd=self.working_directory).strip()
+        
+    def is_fixed_revision(self, revision):
+        return False
+        
 
 def _is_local(uri):
     return "://" not in uri

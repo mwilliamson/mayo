@@ -65,6 +65,15 @@ class GitRepository(object):
         
     def head_revision(self):
         return _git(["rev-parse", "HEAD"], cwd=self.working_directory).output.strip()
+        
+    def is_fixed_revision(self, revision):
+        if revision is None:
+            return False
+        else:
+            return self._is_tag(revision)
+        
+    def _is_tag(self, revision):
+        return bool(_git(["tag", "--list", revision], cwd=self.working_directory).output.strip())
 
 def _git(git_command, *args, **kwargs):
     command = ["git"] + git_command

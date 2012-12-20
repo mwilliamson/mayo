@@ -17,8 +17,6 @@ class WhatIsThisCommand(object):
         else:
             print "{0}+file://{1}".format(repository.type, repository.working_directory)
 
-what_is_this_command = WhatIsThisCommand()
-
 class FetchCommand(object):
     def create_parser(self, subparser):
         subparser.add_argument("repository_uri", metavar="repository-uri")
@@ -45,9 +43,8 @@ class ArchiveCommand(object):
             exit(-1)
 
 
-
 commands = {
-    "what-is-this": what_is_this_command,
+    "what-is-this": WhatIsThisCommand(),
     "fetch": FetchCommand(),
     "archive": ArchiveCommand()
 }

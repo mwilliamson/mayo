@@ -72,7 +72,7 @@ def _update(repository_uri, local_path, vcs):
         message = "Checkout path already exists, and is not directory: {0}".format(local_path)
         raise blah.errors.BlahUserError(message)
     elif not os.path.isdir(vcs_directory):
-        message = "{0} already exists and is not a git repository".format(local_path)
+        message = "{0} already exists and is not a {1} repository".format(local_path, vcs.name)
         raise blah.errors.BlahUserError(message)
     else:
         local_repo = vcs.local_repo(local_path)

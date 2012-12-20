@@ -1,13 +1,25 @@
 import os
 import shutil
+import hashlib
 
 import blah.systems
 import blah.uri_parser
 import blah.errors
+import blah.caching
 
-def archive(uri_str, local_path, use_cache=True):
-    vcs = _fetch(uri_str, local_path)
-    shutil.rmtree(os.path.join(local_path, vcs.directory_name))
+def archive(uri_str, local_path):
+    uri_hash = _sha1(uri_str)
+    cache_dir = os.path.join(blah.caching.cache_root(), "archive", uri_hash)
+    if not os.path.exists(os.path.dirname(cache_dir)):
+        os.makedirs(os.path.dirname(cache_dir))
+    if not os.path.exists(cache_dir):
+        vcs = _fetch(uri_str, cache_dir)
+        shutil.rmtree(os.path.join(cache_dir, vcs.directory_name))
+    
+    shutil.copytree(cache_dir, local_path)
+
+def _sha1(value):
+    return hashlib.sha1(value).hexdigest()
 
 # Define fetch as distinct from _fetch to stop return value leaking
 def fetch(*args, **kwargs):

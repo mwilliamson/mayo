@@ -10,7 +10,7 @@ from blah import UnrecognisedSourceControlSystem
 from blah.errors import BlahUserError
 from blah.systems import all_systems
 
-from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
+from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
 import test_repos
 
 def vcs_agnostic_test(func=None, params=(), **kwargs):
@@ -128,12 +128,13 @@ def can_clone_repository_to_specific_commit_using_hash_before_commit_name(vcs, t
 
 @vcs_agnostic_test
 def can_fetch_repo_without_vcs_files(vcs, temp_dir):
-    target = os.path.join(temp_dir, "clone")
-    with vcs.temporary_repo() as repo:
-        original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
-        archive(original_uri, target)
-        assert_equal("Run it.", read_file(os.path.join(target, "README")))
-        assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
+    with temporary_xdg_cache_dir():
+        target = os.path.join(temp_dir, "clone")
+        with vcs.temporary_repo() as repo:
+            original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
+            archive(original_uri, target)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
         
 @istest
 def origin_is_prefixed_to_git_commit_if_necessary():
@@ -158,6 +159,22 @@ def can_use_cache_when_cloning_git_repository():
             original_uri = "git+file://" + git_repo.working_directory
             add_commit_to_repo(git_repo)
             fetch(original_uri + "#master^", target, use_cache=True)
+            assert_equal("Run it.", read_file(os.path.join(target, "README")))
+            
+@istest
+def remote_connection_is_not_required_when_archiving_cached_tagged_commit():
+    with temporary_xdg_cache_dir():
+        with temporary_git_repo() as git_repo:
+            original_uri = "git+file://" + git_repo.working_directory
+            tag_git_repo(git_repo, "0.1")
+            add_commit_to_repo(git_repo)
+            with temporary_directory() as directory:
+                target = os.path.join(directory, "clone")
+                archive(original_uri + "#0.1", target)
+        
+        with temporary_directory() as directory:
+            target = os.path.join(directory, "clone")
+            archive(original_uri + "#0.1", target)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
             
 @istest

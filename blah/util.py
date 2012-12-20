@@ -28,7 +28,7 @@ def run(command, cwd=None, allow_error=False):
         error = subprocess.CalledProcessError(return_code, command)
         error.output = output
         error.stderr_output = stderr_output
-        raise error
+        raise RuntimeError("error: " + stderr_output)
     return result
 
 class ExecutionResult(object):

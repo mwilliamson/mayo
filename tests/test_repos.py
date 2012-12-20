@@ -51,6 +51,9 @@ def add_commit_to_repo(repo):
     execute(repo, ["add", "README"])
     execute(repo, ["commit", "-mUpdating README"])
 
+def tag_git_repo(repo, tag_name):
+    execute(repo, ["tag", tag_name])
+
 _dev_null = open('/dev/null', 'w')
 
 def execute(repo, command):

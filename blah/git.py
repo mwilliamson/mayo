@@ -2,9 +2,8 @@ import os
 import os.path
 import hashlib
 
-from xdg.BaseDirectory import save_cache_path
-
 from blah.util import run
+import blah.caching
 
 
 class Git(object):
@@ -35,16 +34,16 @@ class Git(object):
         return GitRepository(working_directory)
         
     def _update_cache(self, repository_uri):
-        cache_dir = os.environ.get("BLAH_CACHE_DIR", save_cache_path("blah"))
+        cache_root = blah.caching.cache_root()
         repo_hash = hashlib.sha1(repository_uri).hexdigest()
-        cache_repo = os.path.join(cache_dir, repo_hash)
+        cache_dir = os.path.join(cache_root, repo_hash)
         
-        if os.path.exists(cache_repo):
-            _git(["fetch"], cwd=cache_repo)
+        if os.path.exists(cache_dir):
+            _git(["fetch"], cwd=cache_dir)
         else:
-            _git(["clone", repository_uri, cache_repo])
+            _git(["clone", repository_uri, cache_dir])
             
-        return cache_repo
+        return cache_dir
 
 class GitRepository(object):
     type = Git.name

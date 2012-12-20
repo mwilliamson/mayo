@@ -33,7 +33,6 @@ class FetchCommand(object):
             exit(-1)
 
 commands = {
-    "whatisthis": what_is_this_command,
     "what-is-this": what_is_this_command,
     "fetch": FetchCommand()
 }

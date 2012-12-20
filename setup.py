@@ -15,5 +15,5 @@ setup(
     url='http://github.com/mwilliamson/blah',
     scripts=["scripts/blah"],
     packages=['blah'],
-    install_requires=["argparse==1.2.1", "nose==1.2.1", "pyxdg==0.25"],
+    install_requires=["argparse==1.2.1", "nose==1.2.1"],
 )

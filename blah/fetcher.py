@@ -51,7 +51,8 @@ def _find_vcs(uri, systems):
         if uri.vcs == vcs.name:
             return vcs
             
-    raise blah.errors.UnrecognisedSourceControlSystem("Source control system not recognised: " + uri.vcs)
+    message = "Source control system not recognised: {0}".format(uri.vcs)
+    raise blah.errors.UnrecognisedSourceControlSystem(message)
 
 def _fetch_all_revisions(uri, local_path, vcs):
     if os.path.exists(local_path):
@@ -68,7 +69,8 @@ def _read_revision(vcs, uri):
 def _update(repository_uri, local_path, vcs):
     vcs_directory = os.path.join(local_path, vcs.directory_name)
     if not os.path.isdir(local_path):
-        raise blah.errors.BlahUserError("Checkout path already exists, and is not directory: " + local_path)
+        message = "Checkout path already exists, and is not directory: {0}".format(local_path)
+        raise blah.errors.BlahUserError(message)
     elif not os.path.isdir(vcs_directory):
         message = "{0} already exists and is not a git repository".format(local_path)
         raise blah.errors.BlahUserError(message)

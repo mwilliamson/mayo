@@ -4,7 +4,7 @@ import contextlib
 
 from nose.tools import istest, assert_equal, assert_false
 
-from blah.fetcher import fetch
+from blah.fetcher import fetch, archive
 from blah.files import mkdir_p, temporary_directory, write_file, read_file
 from blah import UnrecognisedSourceControlSystem
 from blah.errors import BlahUserError
@@ -131,7 +131,7 @@ def can_fetch_repo_without_vcs_files(vcs, temp_dir):
     target = os.path.join(temp_dir, "clone")
     with vcs.temporary_repo() as repo:
         original_uri = "{0}+file://{1}".format(vcs.name, repo.working_directory)
-        fetch(original_uri, target, archive=True)
+        archive(original_uri, target)
         assert_equal("Run it.", read_file(os.path.join(target, "README")))
         assert_false(os.path.exists(os.path.join(target, vcs.directory_name)))
         

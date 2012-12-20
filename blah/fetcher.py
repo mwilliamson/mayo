@@ -5,7 +5,15 @@ import blah.systems
 import blah.uri_parser
 import blah.errors
 
-def fetch(uri_str, local_path, archive=False, use_cache=False, systems=None):
+def archive(uri_str, local_path, use_cache=True):
+    vcs = _fetch(uri_str, local_path)
+    shutil.rmtree(os.path.join(local_path, vcs.directory_name))
+
+# Define fetch as distinct from _fetch to stop return value leaking
+def fetch(*args, **kwargs):
+    _fetch(*args, **kwargs)
+
+def _fetch(uri_str, local_path, use_cache=False, systems=None):
     if systems is None:
         systems = blah.systems.all_systems
     
@@ -17,8 +25,7 @@ def fetch(uri_str, local_path, archive=False, use_cache=False, systems=None):
     local_repo = _fetch_all_revisions(uri, local_path, vcs)
     revision = _read_revision(vcs, uri)
     local_repo.checkout_revision(revision)
-    if archive:
-        shutil.rmtree(os.path.join(local_path, vcs.directory_name))
+    return vcs
 
 def _find_vcs(uri, systems):
     for vcs in systems:

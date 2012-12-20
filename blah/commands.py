@@ -32,7 +32,22 @@ class FetchCommand(object):
             print "fetch failed: {0}".format(error.message)
             exit(-1)
 
+class ArchiveCommand(object):
+    def create_parser(self, subparser):
+        subparser.add_argument("repository_uri", metavar="repository-uri")
+        subparser.add_argument("local_path", metavar="local-path")
+    
+    def execute(self, args):
+        try:
+            blah.fetcher.archive(args.repository_uri, args.local_path)
+        except (blah.errors.BlahUserError, blah.util.NoSuchCommandError) as error:
+            print "archive failed: {0}".format(error.message)
+            exit(-1)
+
+
+
 commands = {
     "what-is-this": what_is_this_command,
-    "fetch": FetchCommand()
+    "fetch": FetchCommand(),
+    "archive": ArchiveCommand()
 }

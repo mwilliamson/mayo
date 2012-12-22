@@ -236,15 +236,25 @@ def assert_raises_message(expected_error_type, expected_message, func):
 def temporary_xdg_cache_dir():
     key = "XDG_CACHE_HOME"
     with temporary_directory() as cache_dir:
-        original_value = os.environ.get(key)
-        try:
-            os.environ[key] = cache_dir
+        with updated_env({key: cache_dir}):
             yield
-        finally:
+
+@contextlib.contextmanager
+def updated_env(env_updates):
+    original_env = {}
+    for key, updated_value in env_updates.iteritems():
+        original_env[key] = os.environ.get(key)
+    os.environ[key] = updated_value
+
+    try:
+        yield
+    finally:
+        for key, original_value in original_env.iteritems():
             if original_value is None:
                 del os.environ[key]
             else:
                 os.environ[key] = original_value
+
 
 @contextlib.contextmanager
 def temporary_empty_dir():

@@ -2,6 +2,8 @@ import os
 import shutil
 import hashlib
 
+import catchy
+
 import blah.systems
 import blah.uri_parser
 import blah.errors
@@ -9,10 +11,9 @@ import blah.caching
 
 def archive(uri_str, local_path):
     uri_hash = _sha1(uri_str)
-    cache_dir = os.path.join(blah.caching.cache_root(), "archive", uri_hash)
-    if os.path.exists(cache_dir):
-        shutil.copytree(cache_dir, local_path)
-    else:
+    cacher = catchy.DirectoryCacher(os.path.join(blah.caching.cache_root(), "archive"))
+    cache_result = cacher.fetch(uri_hash, local_path)
+    if not cache_result.cache_hit:
         uri = blah.uri_parser.parse(uri_str)
         
         vcs, local_repo = _fetch(uri_str, local_path)
@@ -20,10 +21,7 @@ def archive(uri_str, local_path):
         shutil.rmtree(os.path.join(local_path, vcs.directory_name))
         
         if is_fixed_revision:
-            if not os.path.exists(os.path.dirname(cache_dir)):
-                os.makedirs(os.path.dirname(cache_dir))
-            
-            shutil.copytree(local_path, cache_dir)
+            cacher.put(uri_hash, local_path)
 
 def _sha1(value):
     return hashlib.sha1(value).hexdigest()

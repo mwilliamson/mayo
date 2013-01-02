@@ -8,12 +8,12 @@ def read(fname):
 
 setup(
     name='blah',
-    version='0.1.10',
+    version='0.1.11',
     description='Thin wrapper around source control systems',
     long_description=read("README"),
     author='Michael Williamson',
     url='http://github.com/mwilliamson/blah',
     scripts=["scripts/blah"],
     packages=['blah'],
-    install_requires=["argparse==1.2.1", "catchy==0.1.0"],
+    install_requires=["argparse==1.2.1", "catchy>=0.1.0"],
 )

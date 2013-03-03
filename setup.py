@@ -15,5 +15,5 @@ setup(
     url='http://github.com/mwilliamson/blah',
     scripts=["scripts/blah"],
     packages=['blah'],
-    install_requires=["argparse==1.2.1", "catchy>=0.1.0"],
+    install_requires=["argparse==1.2.1", "catchy>=0.1.0,<0.2"],
 )

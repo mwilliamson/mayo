@@ -1,7 +1,7 @@
 import os
 
-from blah import systems
-from blah.files import parent
+from . import systems
+from .files import parent
 
 def repository_at(working_directory):
     directory = os.path.abspath(working_directory)

@@ -1,4 +1,4 @@
-from blah.util import quiet_check_call, quiet_check_output
+from .util import quiet_check_call, quiet_check_output
 
 class Hg(object):
     name = "hg"

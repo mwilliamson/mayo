@@ -2,7 +2,7 @@
 
 import argparse
 
-from blah.commands import commands
+from mayo.commands import commands
 
 def main():
     parser = argparse.ArgumentParser()

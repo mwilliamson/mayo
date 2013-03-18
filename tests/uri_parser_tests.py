@@ -1,6 +1,6 @@
 from nose.tools import istest, assert_equal
 
-from blah.uri_parser import parse
+from mayo.uri_parser import parse
 
 @istest
 def vcs_is_none_if_plus_doesnt_occur_in_uri():

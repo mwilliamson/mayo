@@ -2,8 +2,8 @@ import os
 import os.path
 import hashlib
 
-from blah.util import run
-import blah.caching
+from .util import run
+import mayo.caching
 
 
 class Git(object):
@@ -34,7 +34,7 @@ class Git(object):
         return GitRepository(working_directory)
         
     def _update_cache(self, repository_uri):
-        cache_root = blah.caching.cache_root()
+        cache_root = mayo.caching.cache_root()
         repo_hash = hashlib.sha1(repository_uri).hexdigest()
         cache_dir = os.path.join(cache_root, repo_hash)
         

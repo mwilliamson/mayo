@@ -1,9 +1,9 @@
 import os
 import argparse
 
-import blah.repositories
-import blah.fetcher
-import blah.errors
+import mayo.repositories
+import mayo.fetcher
+import mayo.errors
 
 class WhatIsThisCommand(object):
     def create_parser(self, subparser):
@@ -11,7 +11,7 @@ class WhatIsThisCommand(object):
     
     def execute(self, args):
         directory = args.directory if args.directory is not None else os.getcwd()
-        repository = blah.repositories.find_repository(directory)
+        repository = mayo.repositories.find_repository(directory)
         if repository is None:
             print "Could not find source control repository"
         else:
@@ -25,8 +25,8 @@ class FetchCommand(object):
     
     def execute(self, args):
         try:
-            blah.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
-        except (blah.errors.BlahUserError, blah.util.NoSuchCommandError) as error:
+            mayo.fetcher.fetch(args.repository_uri, args.local_path, args.use_cache)
+        except (mayo.errors.MayoUserError, mayo.util.NoSuchCommandError) as error:
             print "fetch failed: {0}".format(error.message)
             exit(-1)
 
@@ -37,8 +37,8 @@ class ArchiveCommand(object):
     
     def execute(self, args):
         try:
-            blah.fetcher.archive(args.repository_uri, args.local_path)
-        except (blah.errors.BlahUserError, blah.util.NoSuchCommandError) as error:
+            mayo.fetcher.archive(args.repository_uri, args.local_path)
+        except (mayo.errors.MayoUserError, mayo.util.NoSuchCommandError) as error:
             print "archive failed: {0}".format(error.message)
             exit(-1)
 

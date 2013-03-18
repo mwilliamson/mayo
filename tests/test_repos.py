@@ -2,9 +2,9 @@ import os
 import subprocess
 from contextlib import contextmanager
 
-from blah.git import Git
-from blah.hg import Hg
-from blah.files import temporary_directory, write_file
+from mayo.git import Git
+from mayo.hg import Hg
+from mayo.files import temporary_directory, write_file
 
 def create_repo(vcs_name, path):
     return {

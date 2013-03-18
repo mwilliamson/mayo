@@ -2,8 +2,8 @@ import os
 
 from nose.tools import istest, assert_equal
 
-from blah.repositories import repository_at, find_repository
-from blah.files import mkdir_p, temporary_directory
+from mayo.repositories import repository_at, find_repository
+from mayo.files import mkdir_p, temporary_directory
 
 @istest
 def none_is_returned_if_there_is_no_repository():

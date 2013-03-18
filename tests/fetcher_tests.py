@@ -4,11 +4,11 @@ import contextlib
 
 from nose.tools import istest, assert_equal, assert_false
 
-from blah.fetcher import fetch, archive
-from blah.files import mkdir_p, temporary_directory, write_file, read_file
-from blah import UnrecognisedSourceControlSystem
-from blah.errors import BlahUserError
-from blah.systems import all_systems
+from mayo.fetcher import fetch, archive
+from mayo.files import mkdir_p, temporary_directory, write_file, read_file
+from mayo import UnrecognisedSourceControlSystem
+from mayo.errors import MayoUserError
+from mayo.systems import all_systems
 
 from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
 import test_repos
@@ -182,7 +182,7 @@ def error_is_raised_if_target_is_file():
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
             assert_raises_message(
-                BlahUserError,
+                MayoUserError,
                 "Checkout path already exists, and is not directory: {0}".format(target),
                 lambda: fetch(original_uri, target)
             )
@@ -193,7 +193,7 @@ def git_fetch_raises_error_if_target_is_not_git_repository():
         with temporary_git_repo() as git_repo:
             original_uri = "git+file://" + git_repo.working_directory
             assert_raises_message(
-                BlahUserError,
+                MayoUserError,
                 "{0} already exists and is not a git repository".format(target),
                 lambda: fetch(original_uri, target)
             )
@@ -205,7 +205,7 @@ def git_fetch_raises_error_if_target_is_checkout_of_different_repository():
             with temporary_git_repo() as second_repo:
                 fetch("git+file://" + first_repo.working_directory, target)
                 assert_raises_message(
-                    BlahUserError,
+                    MayoUserError,
                     "{0} is existing checkout of different repository: file://{1}"
                         .format(target, first_repo.working_directory),
                     lambda: fetch("git+file://" + second_repo.working_directory, target)
@@ -218,7 +218,7 @@ def hg_fetch_raises_error_if_target_is_checkout_of_different_repository():
             with temporary_hg_repo() as second_repo:
                 fetch("hg+file://" + first_repo.working_directory, target)
                 assert_raises_message(
-                    BlahUserError,
+                    MayoUserError,
                     "{0} is existing checkout of different repository: file://{1}"
                         .format(target, first_repo.working_directory),
                     lambda: fetch("hg+file://" + second_repo.working_directory, target)

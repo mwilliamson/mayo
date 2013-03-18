@@ -4,17 +4,17 @@ import hashlib
 
 import catchy
 
-import blah.systems
-import blah.uri_parser
-import blah.errors
-import blah.caching
+import mayo.systems
+import mayo.uri_parser
+import mayo.errors
+import mayo.caching
 
 def archive(uri_str, local_path):
     uri_hash = _sha1(uri_str)
-    cacher = catchy.DirectoryCacher(os.path.join(blah.caching.cache_root(), "archive"))
+    cacher = catchy.DirectoryCacher(os.path.join(mayo.caching.cache_root(), "archive"))
     cache_result = cacher.fetch(uri_hash, local_path)
     if not cache_result.cache_hit:
-        uri = blah.uri_parser.parse(uri_str)
+        uri = mayo.uri_parser.parse(uri_str)
         
         vcs, local_repo = _fetch(uri_str, local_path)
         is_fixed_revision = local_repo.is_fixed_revision(uri.revision)
@@ -32,9 +32,9 @@ def fetch(*args, **kwargs):
 
 def _fetch(uri_str, local_path, use_cache=False, systems=None):
     if systems is None:
-        systems = blah.systems.all_systems
+        systems = mayo.systems.all_systems
     
-    uri = blah.uri_parser.parse(uri_str)
+    uri = mayo.uri_parser.parse(uri_str)
     
     vcs = _find_vcs(uri, systems)
     if use_cache and getattr(vcs, "supports_caching", False):
@@ -50,7 +50,7 @@ def _find_vcs(uri, systems):
             return vcs
             
     message = "Source control system not recognised: {0}".format(uri.vcs)
-    raise blah.errors.UnrecognisedSourceControlSystem(message)
+    raise mayo.errors.UnrecognisedSourceControlSystem(message)
 
 def _fetch_all_revisions(uri, local_path, vcs):
     if os.path.exists(local_path):
@@ -68,10 +68,10 @@ def _update(repository_uri, local_path, vcs):
     vcs_directory = os.path.join(local_path, vcs.directory_name)
     if not os.path.isdir(local_path):
         message = "Checkout path already exists, and is not directory: {0}".format(local_path)
-        raise blah.errors.BlahUserError(message)
+        raise mayo.errors.MayoUserError(message)
     elif not os.path.isdir(vcs_directory):
         message = "{0} already exists and is not a {1} repository".format(local_path, vcs.name)
-        raise blah.errors.BlahUserError(message)
+        raise mayo.errors.MayoUserError(message)
     else:
         local_repo = vcs.local_repo(local_path)
         current_remote_uri = local_repo.remote_repo_uri()
@@ -81,5 +81,5 @@ def _update(repository_uri, local_path, vcs):
         else:
             message = "{0} is existing checkout of different repository: {1}" \
                 .format(local_path, current_remote_uri)
-            raise blah.errors.BlahUserError(message)
+            raise mayo.errors.MayoUserError(message)
     

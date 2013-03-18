@@ -7,21 +7,14 @@ import catchy
 import mayo.systems
 import mayo.uri_parser
 import mayo.errors
-import mayo.caching
+
 
 def archive(uri_str, local_path):
     uri_hash = _sha1(uri_str)
-    cacher = catchy.DirectoryCacher(os.path.join(mayo.caching.cache_root(), "archive"))
-    cache_result = cacher.fetch(uri_hash, local_path)
-    if not cache_result.cache_hit:
-        uri = mayo.uri_parser.parse(uri_str)
-        
-        vcs, local_repo = _fetch(uri_str, local_path)
-        is_fixed_revision = local_repo.is_fixed_revision(uri.revision)
-        shutil.rmtree(os.path.join(local_path, vcs.directory_name))
-        
-        if is_fixed_revision:
-            cacher.put(uri_hash, local_path)
+    uri = mayo.uri_parser.parse(uri_str)
+    
+    vcs, local_repo = _fetch(uri_str, local_path)
+    shutil.rmtree(os.path.join(local_path, vcs.directory_name))
 
 def _sha1(value):
     return hashlib.sha1(value).hexdigest()

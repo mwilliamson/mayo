@@ -3,7 +3,6 @@ import os.path
 import hashlib
 
 from .util import run
-import mayo.caching
 
 
 class Git(object):

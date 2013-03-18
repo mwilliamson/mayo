@@ -161,20 +161,8 @@ def can_use_cache_when_cloning_git_repository():
             add_commit_to_repo(git_repo)
             fetch(original_uri + "#master^", target, use_cache=True)
             assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            
-@test
-def remote_connection_is_not_required_when_archiving_cached_tagged_commit():
-    with temporary_git_repo() as git_repo:
-        original_uri = "git+file://" + git_repo.working_directory
-        tag_git_repo(git_repo, "0.1")
-        add_commit_to_repo(git_repo)
-        with temporary_empty_dir() as target:
-            archive(original_uri + "#0.1", target)
-    
-    with temporary_empty_dir() as target:
-        archive(original_uri + "#0.1", target)
-        assert_equal("Run it.", read_file(os.path.join(target, "README")))
-            
+
+
 @test
 def error_is_raised_if_target_is_file():
     with temporary_empty_dir() as target:

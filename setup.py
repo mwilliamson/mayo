@@ -15,5 +15,5 @@ setup(
     url='http://github.com/mwilliamson/mayo',
     scripts=["scripts/mayo"],
     packages=['mayo'],
-    install_requires=["argparse==1.2.1", "catchy>=0.1.0,<0.2"],
+    install_requires=["argparse==1.2.1", "catchy>=0.2,<0.3"],
 )

@@ -1,5 +1,4 @@
 import subprocess
-import errno
 
 _dev_null = open('/dev/null', 'w')
 

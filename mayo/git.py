@@ -1,7 +1,3 @@
-import os
-import os.path
-import hashlib
-
 from .util import run
 
 

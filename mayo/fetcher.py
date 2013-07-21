@@ -2,17 +2,12 @@ import os
 import shutil
 import hashlib
 
-import catchy
-
 import mayo.systems
 import mayo.uri_parser
 import mayo.errors
 
 
 def archive(uri_str, local_path):
-    uri_hash = _sha1(uri_str)
-    uri = mayo.uri_parser.parse(uri_str)
-    
     vcs, local_repo = _fetch(uri_str, local_path)
     shutil.rmtree(os.path.join(local_path, vcs.directory_name))
 

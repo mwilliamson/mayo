@@ -12,6 +12,7 @@ setup(
     description='Thin wrapper around source control systems',
     long_description=read("README"),
     author='Michael Williamson',
+    author_email='mike@zwobble.org',
     url='http://github.com/mwilliamson/mayo',
     scripts=["scripts/mayo"],
     packages=['mayo'],

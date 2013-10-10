@@ -1,3 +1,6 @@
 *.pyc
 /_virtualenv
 /mayo.egg-info
+/README
+/.tox
+/MANIFEST

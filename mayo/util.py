@@ -1,4 +1,6 @@
 import subprocess
+import locale
+
 
 _dev_null = open('/dev/null', 'w')
 
@@ -20,7 +22,7 @@ def run(command, cwd=None, allow_error=False):
     except OSError as error:
         raise NoSuchCommandError(command[0])
         
-    output, stderr_output = process.communicate()
+    output, stderr_output = map(_decode, process.communicate())
     return_code = process.poll()
     result = ExecutionResult(return_code, output)
     if not allow_error and return_code:
@@ -29,6 +31,11 @@ def run(command, cwd=None, allow_error=False):
         error.stderr_output = stderr_output
         raise RuntimeError("error: " + stderr_output)
     return result
+
+
+def _decode(raw_bytes):
+    return raw_bytes.decode(locale.getdefaultlocale()[1])
+
 
 class ExecutionResult(object):
     def __init__(self, return_code, output):

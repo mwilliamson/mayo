@@ -1,6 +1,6 @@
 from nose.tools import assert_not_equal, istest
 
-from test_repos import temporary_hg_repo, add_commit_to_repo
+from .test_repos import temporary_hg_repo, add_commit_to_repo
 
 @istest
 def head_revision_of_hg_repository_changes_after_commit():

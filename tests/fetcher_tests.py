@@ -2,7 +2,8 @@ import os
 import functools
 import contextlib
 
-from nose.tools import istest, assert_equal, assert_false
+import six
+from nose.tools import istest, nottest, assert_equal, assert_false
 
 from mayo.fetcher import fetch, archive
 from mayo.files import mkdir_p, temporary_directory, write_file, read_file
@@ -10,10 +11,11 @@ from mayo import UnrecognisedSourceControlSystem
 from mayo.errors import MayoUserError
 from mayo.systems import all_systems
 
-from test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
-import test_repos
+from .test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
+from . import test_repos
 
 
+@nottest
 def test(func):
     @functools.wraps(func)
     def run_test(*args, **kwargs):
@@ -217,7 +219,7 @@ def assert_raises_message(expected_error_type, expected_message, func):
         func()
         assert False
     except expected_error_type as error:
-        assert_equal(expected_message, error.message)
+        assert_equal(expected_message, str(error))
 
 
 @contextlib.contextmanager
@@ -230,14 +232,14 @@ def temporary_xdg_cache_dir():
 @contextlib.contextmanager
 def updated_env(env_updates):
     original_env = {}
-    for key, updated_value in env_updates.iteritems():
+    for key, updated_value in six.iteritems(env_updates):
         original_env[key] = os.environ.get(key)
-    os.environ[key] = updated_value
+        os.environ[key] = updated_value
 
     try:
         yield
     finally:
-        for key, original_value in original_env.iteritems():
+        for key, original_value in six.iteritems(original_env):
             if original_value is None:
                 del os.environ[key]
             else:

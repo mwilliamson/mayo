@@ -1,12 +1,8 @@
-import locale
-
 import spur.local
 
 
 shell = spur.local.LocalShell()
 
-
-_dev_null = open('/dev/null', 'w')
 
 def quiet_check_call(command, cwd=None):
     return run(command, cwd=cwd).return_code

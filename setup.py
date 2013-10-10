@@ -16,6 +16,6 @@ setup(
     url='http://github.com/mwilliamson/mayo',
     scripts=["scripts/mayo"],
     packages=['mayo'],
-    install_requires=["argparse==1.2.1"],
+    install_requires=["argparse==1.2.1", "spur.local>=0.3.5,<0.4"],
     keywords="source control vcs scm git mercurial hg",
 )

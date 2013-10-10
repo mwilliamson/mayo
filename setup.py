@@ -17,4 +17,5 @@ setup(
     scripts=["scripts/mayo"],
     packages=['mayo'],
     install_requires=["argparse==1.2.1", "catchy>=0.2,<0.3"],
+    keywords="source control vcs scm git mercurial hg",
 )

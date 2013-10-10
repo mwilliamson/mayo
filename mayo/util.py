@@ -17,9 +17,6 @@ def quiet_call(command, cwd=None):
 def quiet_check_output(command, cwd):
     return run(command, cwd=cwd).output
     
-def _quiet_subprocess_eval(func, args, kwargs):
-    return func(*args, stdout=_dev_null, stderr=subprocess.STDOUT, **kwargs)
-
 
 run = shell.run
 

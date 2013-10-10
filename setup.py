@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='mayo',
-    version='0.2.1',
+    version='0.2.2',
     description='Thin wrapper around source control systems',
     long_description=read("README"),
     author='Michael Williamson',

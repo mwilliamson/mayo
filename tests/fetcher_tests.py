@@ -6,12 +6,12 @@ import six
 from nose.tools import istest, nottest, assert_equal, assert_false
 
 from mayo.fetcher import fetch, archive
-from mayo.files import mkdir_p, temporary_directory, write_file, read_file
+from mayo.files import temporary_directory, write_file, read_file
 from mayo import UnrecognisedSourceControlSystem
 from mayo.errors import MayoUserError
 from mayo.systems import all_systems
 
-from .test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo, tag_git_repo
+from .test_repos import temporary_hg_repo, temporary_git_repo, add_commit_to_repo
 from . import test_repos
 
 

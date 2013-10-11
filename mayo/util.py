@@ -1,3 +1,5 @@
+import locale
+
 import spur.local
 
 
@@ -14,7 +16,15 @@ def quiet_check_output(command, cwd):
     return run(command, cwd=cwd).output
     
 
-run = shell.run
+def run(*args, **kwargs):
+    result = shell.run(*args, **kwargs)
+    result.output = _decode(result.output)
+    result.stderr_output = _decode(result.stderr_output)
+    return result
 
 
 NoSuchCommandError = spur.local.NoSuchCommandError
+
+
+def _decode(raw_bytes):
+    return raw_bytes.decode(locale.getdefaultlocale()[1])

@@ -18,6 +18,8 @@ def create_unrecognised_repo(path):
 def create_git_repo(path):
     repository = Git().local_repo(path)
     execute(repository, ["init"])
+    execute(repository, ["config", "user.email", "bob@example.com"])
+    execute(repository, ["config", "user.name", "Bob Bobertson"])
     write_file(os.path.join(path, "README"), "Run it.")
     execute(repository, ["add", "README"])
     execute(repository, ["commit", "-mAdding README"])

@@ -21,19 +21,19 @@ class GitRepository(object):
         self.working_directory = working_directory
     
     def update(self):
-        _git(["fetch"], cwd=self.working_directory)
+        self._git(["fetch"])
 
     def checkout_revision(self, revision):
-        if _git(["branch", "-r", "--contains", "origin/" + revision], cwd=self.working_directory, allow_error=True).return_code == 0:
+        if self._git(["branch", "-r", "--contains", "origin/" + revision], allow_error=True).return_code == 0:
             revision = "origin/" + revision
             
-        _git(["checkout", revision], cwd=self.working_directory)
+        self._git(["checkout", revision])
 
     def remote_repo_uri(self):
-        return _git(["config", "remote.origin.url"], cwd=self.working_directory).output.strip()
+        return self._git(["config", "remote.origin.url"]).output.strip()
         
     def head_revision(self):
-        return _git(["rev-parse", "HEAD"], cwd=self.working_directory).output.strip()
+        return self._git(["rev-parse", "HEAD"]).output.strip()
 
     def find_ignored_files(self):
         result = self._git(["status", "-z", "--ignored"])
@@ -45,8 +45,8 @@ class GitRepository(object):
             if line.startswith(ignore_prefix)
         ]
     
-    def _git(self, git_command):
-        return _git(git_command, cwd=self.working_directory)
+    def _git(self, git_command, **kwargs):
+        return _git(git_command, cwd=self.working_directory, **kwargs)
         
 
 def _git(git_command, *args, **kwargs):

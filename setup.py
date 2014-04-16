@@ -17,7 +17,7 @@ if sys.version_info[:2] <= (2, 6):
 
 setup(
     name='mayo',
-    version='0.2.4',
+    version='0.2.5',
     description='Thin wrapper around source control systems',
     long_description=read("README"),
     author='Michael Williamson',

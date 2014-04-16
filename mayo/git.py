@@ -34,6 +34,19 @@ class GitRepository(object):
         
     def head_revision(self):
         return _git(["rev-parse", "HEAD"], cwd=self.working_directory).output.strip()
+
+    def find_ignored_files(self):
+        result = self._git(["status", "-z", "--ignored"])
+        lines = result.output.split(b"\0")
+        ignore_prefix = b"!! "
+        return [
+            line[len(ignore_prefix):].decode("utf8")
+            for line in lines
+            if line.startswith(ignore_prefix)
+        ]
+    
+    def _git(self, git_command):
+        return _git(git_command, cwd=self.working_directory)
         
 
 def _git(git_command, *args, **kwargs):

@@ -36,7 +36,7 @@ class GitRepository(object):
         return self._git(["rev-parse", "HEAD"]).output.strip()
 
     def find_ignored_files(self):
-        result = self._git(["status", "-z", "--ignored"])
+        result = self._git(["status", "-z", "--ignored"], decode=False)
         lines = result.output.split(b"\0")
         ignore_prefix = b"!! "
         return [

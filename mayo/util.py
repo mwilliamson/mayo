@@ -17,9 +17,11 @@ def quiet_check_output(command, cwd):
     
 
 def run(*args, **kwargs):
+    decode = kwargs.pop("decode", True)
     result = shell.run(*args, **kwargs)
-    result.output = _decode(result.output)
-    result.stderr_output = _decode(result.stderr_output)
+    if decode:
+        result.output = _decode(result.output)
+        result.stderr_output = _decode(result.stderr_output)
     return result
 
 
